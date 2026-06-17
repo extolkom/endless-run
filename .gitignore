@@ -1,0 +1,26 @@
+# ─── Secrets — NEVER commit these ───
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.local
+
+# ─── Dependencies ───
+node_modules/
+**/node_modules/
+
+# ─── Build output ───
+.next/
+**/.next/
+dist/
+**/dist/
+
+# ─── Hardhat ───
+contract/artifacts/
+contract/cache/
+contract/types/
+contract/typechain-types/
+
+# ─── Misc ───
+*.log
+.DS_Store
