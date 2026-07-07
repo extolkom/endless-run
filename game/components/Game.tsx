@@ -12,17 +12,11 @@ declare global {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type ObstacleType = 'spike' | 'spike_group' | 'spike_wall' | 'rotating_wheel' | 'moving_spike' | 'platform_gap' | 'low_ceiling';
+// Import new obstacle system
+import { Obstacle, getSpawnedObstacles, updateObstacle } from '../lib/obstacles';
 
-interface Obstacle {
-  x: number; y: number; width: number; height: number;
-  type: ObstacleType;
-  angle?: number;         // for rotating wheel
-  moveDir?: number;       // for moving spike
-  moveRange?: number;
-  moveOrigin?: number;
-  platform?: boolean;     // is it a jumpable platform
-}
+// Note: Obstacle interface is now defined in lib/obstacles.ts and includes a 'kind' field.
+// The previous ObstacleType enum is removed.
 
 interface Coin {
   x: number; y: number; size: number;
@@ -131,137 +125,162 @@ function drawPlayer(
   // Inner diamond
   ctx.fillStyle = PAL.playerG;
   ctx.beginPath();
-  ctx.moveTo(0, -8); ctx.lineTo(8, 0); ctx.lineTo(0, 8); ctx.lineTo(-8, 0);
-  ctx.closePath(); ctx.fill();
-  // Outline glow
-  ctx.strokeStyle = PAL.neon;
-  ctx.lineWidth = 2;
-  ctx.strokeRect(-h/2, -h/2, h, h);
-
-  // Double jump indicator — blue glow
-  if (jumpCount === 1) {
-    ctx.strokeStyle = PAL.blue;
-    ctx.lineWidth = 3;
-    ctx.globalAlpha = 0.7;
-    ctx.strokeRect(-h/2 - 4, -h/2 - 4, h + 8, h + 8);
-  }
-
-  ctx.restore();
-}
-
-// ─── Draw obstacles ───────────────────────────────────────────────────────────
-
+  ctx.moveTo(0, -8); ctx.lineTo(8// Updated drawObstacle to handle both legacy and new obstacle kinds
 function drawObstacle(ctx: CanvasRenderingContext2D, obs: Obstacle, time: number) {
   ctx.save();
   ctx.translate(Math.round(obs.x), Math.round(obs.y));
 
-  if (obs.type === 'spike') {
-    // Single spike triangle
-    ctx.fillStyle = PAL.spike;
-    ctx.beginPath();
-    ctx.moveTo(0, obs.height);
-    ctx.lineTo(obs.width / 2, 0);
-    ctx.lineTo(obs.width, obs.height);
-    ctx.closePath(); ctx.fill();
-    ctx.fillStyle = PAL.spikeDk;
-    ctx.fillRect(0, obs.height - 4, obs.width, 4);
-    // Glow
-    ctx.shadowColor = PAL.spike;
-    ctx.shadowBlur = 8;
-    ctx.strokeStyle = '#ff6b8a';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-
-  } else if (obs.type === 'spike_group') {
-    const count = Math.round(obs.width / 28);
-    for (let i = 0; i < count; i++) {
-      const sx = i * 28;
-      ctx.fillStyle = i % 2 === 0 ? PAL.spike : PAL.spikeDk;
+  // Legacy types (keep for backward compatibility)
+  if ((obs as any).type) {
+    const legacy = obs as any;
+    if (legacy.type === 'spike') {
+      ctx.fillStyle = PAL.spike;
       ctx.beginPath();
-      ctx.moveTo(sx, obs.height);
-      ctx.lineTo(sx + 14, 0);
-      ctx.lineTo(sx + 28, obs.height);
+      ctx.moveTo(0, legacy.height);
+      ctx.lineTo(legacy.width / 2, 0);
+      ctx.lineTo(legacy.width, legacy.height);
       ctx.closePath(); ctx.fill();
-    }
-    ctx.fillStyle = PAL.spikeDk;
-    ctx.fillRect(0, obs.height - 4, obs.width, 4);
-
-  } else if (obs.type === 'spike_wall') {
-    // Tall wall with spikes on top
-    px(ctx, 0, 0, obs.width, obs.height, PAL.spikeDk);
-    px(ctx, 2, 0, obs.width - 4, obs.height - 2, PAL.spike);
-    // Spikes on top
-    for (let i = 0; i < 2; i++) {
-      ctx.fillStyle = PAL.red;
-      ctx.beginPath();
-      ctx.moveTo(i * obs.width / 2, 0);
-      ctx.lineTo(obs.width / 4 + i * obs.width / 2, -14);
-      ctx.lineTo(obs.width / 2 + i * obs.width / 2, 0);
-      ctx.closePath(); ctx.fill();
-    }
-
-  } else if (obs.type === 'rotating_wheel') {
-    // Rotating spike wheel
-    ctx.save();
-    ctx.translate(obs.width / 2, obs.height / 2);
-    ctx.rotate(obs.angle || 0);
-    const r = obs.width / 2;
-    // Center circle
-    ctx.fillStyle = PAL.wheel;
-    ctx.beginPath();
-    ctx.arc(0, 0, r * 0.4, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = PAL.wheelDk;
-    ctx.beginPath();
-    ctx.arc(0, 0, r * 0.2, 0, Math.PI * 2); ctx.fill();
-    // 6 spikes
-    for (let i = 0; i < 6; i++) {
-      ctx.save();
-      ctx.rotate((i * Math.PI * 2) / 6);
-      ctx.fillStyle = PAL.amber;
-      ctx.beginPath();
-      ctx.moveTo(-5, r * 0.35);
-      ctx.lineTo(0, r);
-      ctx.lineTo(5, r * 0.35);
-      ctx.closePath(); ctx.fill();
-      ctx.restore();
+      ctx.fillStyle = PAL.spikeDk;
+      ctx.fillRect(0, legacy.height - 4, legacy.width, 4);
+      ctx.shadowColor = PAL.spike; ctx.shadowBlur = 8; ctx.strokeStyle = '#ff6b8a'; ctx.lineWidth = 1.5; ctx.stroke(); ctx.shadowBlur = 0;
+    } else if (legacy.type === 'spike_group') {
+      const count = Math.round(legacy.width / 28);
+      for (let i = 0; i < count; i++) {
+        const sx = i * 28;
+        ctx.fillStyle = i % 2 === 0 ? PAL.spike : PAL.spikeDk;
+        ctx.beginPath(); ctx.moveTo(sx, legacy.height); ctx.lineTo(sx + 14, 0); ctx.lineTo(sx + 28, legacy.height); ctx.closePath(); ctx.fill();
+      }
+      ctx.fillStyle = PAL.spikeDk; ctx.fillRect(0, legacy.height - 4, legacy.width, 4);
+    } else if (legacy.type === 'spike_wall') {
+      px(ctx, 0, 0, legacy.width, legacy.height, PAL.spikeDk);
+      px(ctx, 2, 0, legacy.width - 4, legacy.height - 2, PAL.spike);
+      for (let i = 0; i < 2; i++) { ctx.fillStyle = PAL.red; ctx.beginPath(); ctx.moveTo(i * legacy.width / 2, 0); ctx.lineTo(legacy.width / 4 + i * legacy.width / 2, -14); ctx.lineTo(legacy.width / 2 + i * legacy.width / 2, 0); ctx.closePath(); ctx.fill(); }
+    } else if (legacy.type === 'rotating_wheel') {
+      ctx.save(); ctx.translate(legacy.width / 2, legacy.height / 2); ctx.rotate(legacy.angle || 0);
+      const r = legacy.width / 2; ctx.fillStyle = PAL.wheel; ctx.beginPath(); ctx.arc(0,0,r*0.4,0,Math.PI*2); ctx.fill(); ctx.fillStyle = PAL.wheelDk; ctx.beginPath(); ctx.arc(0,0,r*0.2,0,Math.PI*2); ctx.fill();
+      for (let i=0;i<6;i++) { ctx.save(); ctx.rotate((i*Math.PI*2)/6); ctx.fillStyle = PAL.amber; ctx.beginPath(); ctx.moveTo(-5, r*0.35); ctx.lineTo(0, r); ctx.lineTo(5, r*0.35); ctx.closePath(); ctx.fill(); ctx.restore(); }
+      ctx.restore(); ctx.shadowColor = PAL.amber; ctx.shadowBlur = 12; ctx.strokeStyle = PAL.amber; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(legacy.width/2, legacy.height/2, legacy.width/2,0,Math.PI*2); ctx.stroke(); ctx.shadowBlur = 0;
+    } else if (legacy.type === 'moving_spike') {
+      ctx.fillStyle = PAL.purple; ctx.beginPath(); ctx.moveTo(0, legacy.height); ctx.lineTo(legacy.width/2,0); ctx.lineTo(legacy.width, legacy.height); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#c084fc'; ctx.fillRect(0, legacy.height-4, legacy.width,4); ctx.shadowColor = PAL.purple; ctx.shadowBlur = 10; ctx.strokeStyle = '#e879f9'; ctx.lineWidth = 2; ctx.stroke(); ctx.shadowBlur = 0;
+    } else if (legacy.type === 'platform_gap') {
+      px(ctx,0,0,legacy.width,legacy.height,PAL.platDk); px(ctx,2,2,legacy.width-4,legacy.height/2,PAL.platform); ctx.shadowColor = PAL.blue; ctx.shadowBlur = 8; px(ctx,0,0,legacy.width,4,PAL.cyan); ctx.shadowBlur = 0;
+    } else if (legacy.type === 'low_ceiling') {
+      px(ctx,0,0,legacy.width,legacy.height,PAL.spikeDk); px(ctx,0,legacy.height-4,legacy.width,4,PAL.spike); for (let i=0;i<Math.floor(legacy.width/20);i++) { ctx.fillStyle = PAL.spike; ctx.beginPath(); ctx.moveTo(i*20+2,legacy.height); ctx.lineTo(i*20+10,legacy.height+12); ctx.lineTo(i*20+18,legacy.height); ctx.closePath(); ctx.fill(); }
     }
     ctx.restore();
-    // Glow
-    ctx.shadowColor = PAL.amber;
-    ctx.shadowBlur = 12;
-    ctx.strokeStyle = PAL.amber;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.arc(obs.width / 2, obs.height / 2, obs.width / 2, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.shadowBlur = 0;
+    return;
+  }
 
-  } else if (obs.type === 'moving_spike') {
-    // Moving spike (up/down)
-    ctx.fillStyle = PAL.purple;
-    ctx.beginPath();
-    ctx.moveTo(0, obs.height);
-    ctx.lineTo(obs.width / 2, 0);
-    ctx.lineTo(obs.width, obs.height);
-    ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#c084fc';
-    ctx.fillRect(0, obs.height - 4, obs.width, 4);
-    ctx.shadowColor = PAL.purple;
-    ctx.shadowBlur = 10;
-    ctx.strokeStyle = '#e879f9';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-
-  } else if (obs.type === 'platform_gap') {
-    // Floating platform — player can jump ON it
-    px(ctx, 0, 0, obs.width, obs.height, PAL.platDk);
-    px(ctx, 2, 2, obs.width - 4, obs.height / 2, PAL.platform);
-    // Glow top
-    ctx.shadowColor = PAL.blue;
-    ctx.shadowBlur = 8;
-    px(ctx, 0, 0, obs.width, 4, PAL.cyan);
+  // New obstacle kinds
+  switch (obs.kind) {
+    case 'tumbleweed': {
+      const radius = Math.min(obs.width, obs.height) / 2;
+      const bounce = Math.sin(time * 0.005) * 4;
+      ctx.fillStyle = '#c2b280';
+      ctx.beginPath(); ctx.arc(radius, radius - bounce, radius, 0, Math.PI * 2); ctx.fill();
+      // Simple shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.beginPath(); ctx.ellipse(radius, radius + 2, radius, 4, 0, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
+    case 'sinkhole': {
+      // Dark crater with a crack line that appears shortly before disappearing
+      ctx.fillStyle = '#2f2f2f';
+      ctx.beginPath(); ctx.arc(obs.width/2, obs.height/2, obs.width/2, 0, Math.PI * 2); ctx.fill();
+      // crack (simple line)
+      ctx.strokeStyle = '#555'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, obs.height/2); ctx.lineTo(obs.width, obs.height/2); ctx.stroke();
+      break;
+    }
+    case 'meerkat_pack': {
+      // Small brown rectangles spaced horizontally
+      const count = 3;
+      const w = obs.width / count - 4;
+      for (let i = 0; i < count; i++) {
+        ctx.fillStyle = '#8b4513';
+        ctx.fillRect(i * (w + 4), 0, w, obs.height);
+      }
+      break;
+    }
+    case 'vulture': {
+      // Swooping triangle following sine wave
+      const amplitude = 30;
+      const yOff = Math.sin(time * 0.003 + obs.x * 0.01) * amplitude;
+      ctx.fillStyle = '#222';
+      ctx.beginPath();
+      ctx.moveTo(0, obs.height / 2 + yOff);
+      ctx.lineTo(obs.width / 2, -obs.height / 2 + yOff);
+      ctx.lineTo(obs.width, obs.height / 2 + yOff);
+      ctx.closePath(); ctx.fill();
+      break;
+    }
+    case 'swinging_vine': {
+      const swing = Math.sin(time * 0.004 + obs.x * 0.02) * 15;
+      ctx.strokeStyle = '#2c7a0b'; ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(obs.width / 2, 0); ctx.lineTo(obs.width / 2 + swing, obs.height);
+      ctx.stroke();
+      ctx.fillStyle = '#2c7a0b'; ctx.beginPath(); ctx.arc(obs.width / 2 + swing, obs.height, 6, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
+    case 'drone': {
+      ctx.fillStyle = '#00bcd4';
+      ctx.fillRect(0, 0, obs.width, obs.height);
+      ctx.strokeStyle = '#00796b'; ctx.lineWidth = 2; ctx.strokeRect(0,0,obs.width,obs.height);
+      break;
+    }
+    case 'rolling_boulder': {
+      const radius = Math.min(obs.width, obs.height) / 2;
+      ctx.fillStyle = '#777';
+      ctx.beginPath(); ctx.arc(radius, radius, radius, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
+    case 'rival_predator': {
+      ctx.fillStyle = '#c62828';
+      ctx.fillRect(0, 0, obs.width, obs.height);
+      ctx.fillStyle = '#fff'; ctx.font = '10px "Press Start 2P", monospace'; ctx.fillText('🐾', 2, obs.height - 4);
+      break;
+    }
+    case 'baobab_root': {
+      // Spiky ground eruptions
+      const spikeW = 8;
+      const spikeCount = Math.floor(obs.width / spikeW);
+      for (let i = 0; i < spikeCount; i++) {
+        ctx.fillStyle = '#8d6e63';
+        ctx.beginPath();
+        ctx.moveTo(i * spikeW, obs.height);
+        ctx.lineTo(i * spikeW + spikeW/2, 0);
+        ctx.lineTo((i+1)*spikeW, obs.height);
+        ctx.closePath(); ctx.fill();
+      }
+      break;
+    }
+    case 'gas_fee_wall': {
+      ctx.fillStyle = '#b71c1c';
+      ctx.fillRect(0, 0, obs.width, obs.height);
+      ctx.fillStyle = '#fff'; ctx.font = '8px "Press Start 2P", monospace'; ctx.fillText('HIGH GAS!', 4, obs.height/2 + 4);
+      break;
+    }
+    case 'falling_block': {
+      ctx.fillStyle = '#37474f';
+      ctx.fillRect(0, 0, obs.width, obs.height);
+      // optional small highlight
+      ctx.strokeStyle = '#607d8b'; ctx.lineWidth = 2; ctx.strokeRect(0,0,obs.width,obs.height);
+      break;
+    }
+    case 'rug_pull': {
+      // Looks like normal ground tile but will drop; draw as normal ground color
+      ctx.fillStyle = PAL.ground;
+      ctx.fillRect(0, 0, obs.width, obs.height);
+      break;
+    }
+    default: {
+      // fallback: simple rectangle
+      ctx.fillStyle = '#ff00ff';
+      ctx.fillRect(0,0,obs.width,obs.height);
+    }
+  }
+  ctx.restore();
+}
+h, 4, PAL.cyan);
     ctx.shadowBlur = 0;
 
   } else if (obs.type === 'low_ceiling') {
@@ -948,8 +967,8 @@ export default function Game() {
       if (state.isRunning) {
         const minGap = Math.max(350, 1400 - state.level * 80);
         if (timestamp - lastObsRef.current > minGap) {
-          const newObs = getObstaclePattern(state.level, W, groundY, state.score);
-          obstaclesRef.current.push(...newObs);
+          const newObs = getSpawnedObstacles(state.level, W, groundY, state.score);
+            obstaclesRef.current.push(...newObs);
           lastObsRef.current = timestamp;
         }
       }
