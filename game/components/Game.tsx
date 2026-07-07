@@ -125,7 +125,13 @@ function drawPlayer(
   // Inner diamond
   ctx.fillStyle = PAL.playerG;
   ctx.beginPath();
-  ctx.moveTo(0, -8); ctx.lineTo(8// Updated drawObstacle to handle both legacy and new obstacle kinds
+  ctx.moveTo(0, -8);
+  ctx.lineTo(8, 0);
+  ctx.lineTo(0, 8);
+  ctx.lineTo(-8, 0);
+  ctx.closePath();
+  ctx.fill();
+  // Updated drawObstacle to handle both legacy and new obstacle kinds
 function drawObstacle(ctx: CanvasRenderingContext2D, obs: Obstacle, time: number) {
   ctx.save();
   ctx.translate(Math.round(obs.x), Math.round(obs.y));
