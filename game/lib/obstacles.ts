@@ -50,7 +50,7 @@ export interface Obstacle {
 }
 
 // Helper: weighted random selection
-function weightedRandom<T>(weights: Record<T, number>): T {
+function weightedRandom<T extends PropertyKey>(weights: Record<T, number>): T {
   const entries = Object.entries(weights) as [T, number][];
   const total = entries.reduce((sum, [, w]) => sum + w, 0);
   let r = Math.random() * total;
