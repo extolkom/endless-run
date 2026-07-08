@@ -30,14 +30,23 @@ export interface Obstacle {
   y: number;
   width: number;
   height: number;
-  kind: ObstacleKind;
-  category: ObstacleCategory;
+  // Kind of obstacle (optional for legacy objects)
+  kind?: ObstacleKind;
+  // Category of obstacle (optional for legacy objects)
+  category?: ObstacleCategory;
   // Legacy field – some draw logic still checks `obs.type`
   type?: string;
   // Optional per‑frame state (e.g., timers, animation phases)
+  angle?: number;
+  moveDir?: number;
+  moveRange?: number;
+  moveOrigin?: number;
+  platform?: boolean; // already present, keep
+
   state?: any;
   // When true this obstacle is a jumpable platform (legacy flag kept)
-  platform?: boolean;
+  // (platform already defined above) - no extra field needed
+  // platform flag already defined above; keep only one definition
 }
 
 // Helper: weighted random selection
@@ -54,14 +63,14 @@ function weightedRandom<T>(weights: Record<T, number>): T {
 
 // Spawn weight tables per level (1‑8). Numbers are relative.
 const spawnWeights: Record<number, Record<ObstacleKind, number>> = {
-  1: { tumbleweed: 40, sinkhole: 30, meerkat_pack: 0, vulture: 0, swinging_vine: 0, drone: 0, rolling_boulder: 0, rival_predator: 0, baobab_root: 0, gas_fee_wall: 0, falling_block: 0, rug_pull: 0, spike: 0, spike_group: 0, spike_wall: 0, rotating_wheel: 0, moving_spike: 0, platform_gap: 0, low_ceiling: 0 },
-  2: { tumbleweed: 30, sinkhole: 25, meerkat_pack: 5, vulture: 5, swinging_vine: 5, drone: 0, rolling_boulder: 0, rival_predator: 0, baobab_root: 0, gas_fee_wall: 0, falling_block: 0, rug_pull: 0, spike: 0, spike_group: 0, spike_wall: 0, rotating_wheel: 0, moving_spike: 0, platform_gap: 0, low_ceiling: 0 },
-  3: { tumbleweed: 20, sinkhole: 20, meerkat_pack: 5, vulture: 10, swinging_vine: 10, drone: 5, rolling_boulder: 0, rival_predator: 0, baobab_root: 0, gas_fee_wall: 0, falling_block: 0, rug_pull: 0, spike: 0, spike_group: 0, spike_wall: 0, rotating_wheel: 0, moving_spike: 0, platform_gap: 0, low_ceiling: 0 },
-  4: { tumbleweed: 15, sinkhole: 15, meerkat_pack: 5, vulture: 10, swinging_vine: 10, drone: 10, rolling_boulder: 5, rival_predator: 5, baobab_root: 5, gas_fee_wall: 0, falling_block: 0, rug_pull: 0, spike: 0, spike_group: 0, spike_wall: 0, rotating_wheel: 0, moving_spike: 0, platform_gap: 0, low_ceiling: 0 },
-  5: { tumbleweed: 10, sinkhole: 10, meerkat_pack: 5, vulture: 10, swinging_vine: 10, drone: 10, rolling_boulder: 10, rival_predator: 10, baobab_root: 10, gas_fee_wall: 5, falling_block: 5, rug_pull: 0, spike: 0, spike_group: 0, spike_wall: 0, rotating_wheel: 0, moving_spike: 0, platform_gap: 0, low_ceiling: 0 },
-  6: { tumbleweed: 5, sinkhole: 5, meerkat_pack: 5, vulture: 15, swinging_vine: 15, drone: 10, rolling_boulder: 15, rival_predator: 10, baobab_root: 10, gas_fee_wall: 10, falling_block: 10, rug_pull: 5, spike: 0, spike_group: 0, spike_wall: 0, rotating_wheel: 0, moving_spike: 0, platform_gap: 0, low_ceiling: 0 },
-  7: { tumbleweed: 5, sinkhole: 5, meerkat_pack: 5, vulture: 15, swinging_vine: 15, drone: 10, rolling_boulder: 15, rival_predator: 15, baobab_root: 10, gas_fee_wall: 10, falling_block: 10, rug_pull: 10, spike: 0, spike_group: 0, spike_wall: 0, rotating_wheel: 0, moving_spike: 0, platform_gap: 0, low_ceiling: 0 },
-  8: { tumbleweed: 5, sinkhole: 5, meerkat_pack: 5, vulture: 15, swinging_vine: 15, drone: 15, rolling_boulder: 15, rival_predator: 15, baobab_root: 15, gas_fee_wall: 10, falling_block: 10, rug_pull: 15, spike: 0, spike_group: 0, spike_wall: 0, rotating_wheel: 0, moving_spike: 0, platform_gap: 0, low_ceiling: 0 },
+  1: { tumbleweed: 25, sinkhole: 20, meerkat_pack: 0, vulture: 0, swinging_vine: 0, drone: 0, rolling_boulder: 0, rival_predator: 0, baobab_root: 0, gas_fee_wall: 0, falling_block: 0, rug_pull: 0, spike: 35, spike_group: 20, spike_wall: 0, rotating_wheel: 0, moving_spike: 0, platform_gap: 0, low_ceiling: 0 },
+  2: { tumbleweed: 20, sinkhole: 15, meerkat_pack: 5, vulture: 5, swinging_vine: 5, drone: 0, rolling_boulder: 0, rival_predator: 0, baobab_root: 0, gas_fee_wall: 0, falling_block: 0, rug_pull: 0, spike: 30, spike_group: 20, spike_wall: 10, rotating_wheel: 0, moving_spike: 0, platform_gap: 0, low_ceiling: 0 },
+  3: { tumbleweed: 15, sinkhole: 12, meerkat_pack: 5, vulture: 10, swinging_vine: 10, drone: 5, rolling_boulder: 0, rival_predator: 0, baobab_root: 0, gas_fee_wall: 0, falling_block: 0, rug_pull: 0, spike: 25, spike_group: 18, spike_wall: 10, rotating_wheel: 8, moving_spike: 8, platform_gap: 0, low_ceiling: 0 },
+  4: { tumbleweed: 12, sinkhole: 10, meerkat_pack: 5, vulture: 10, swinging_vine: 10, drone: 10, rolling_boulder: 5, rival_predator: 5, baobab_root: 5, gas_fee_wall: 0, falling_block: 0, rug_pull: 0, spike: 22, spike_group: 15, spike_wall: 12, rotating_wheel: 10, moving_spike: 10, platform_gap: 0, low_ceiling: 0 },
+  5: { tumbleweed: 8, sinkhole: 8, meerkat_pack: 5, vulture: 10, swinging_vine: 10, drone: 10, rolling_boulder: 10, rival_predator: 10, baobab_root: 10, gas_fee_wall: 5, falling_block: 5, rug_pull: 0, spike: 20, spike_group: 15, spike_wall: 12, rotating_wheel: 10, moving_spike: 10, platform_gap: 0, low_ceiling: 0 },
+  6: { tumbleweed: 5, sinkhole: 5, meerkat_pack: 5, vulture: 15, swinging_vine: 15, drone: 10, rolling_boulder: 15, rival_predator: 10, baobab_root: 10, gas_fee_wall: 10, falling_block: 10, rug_pull: 5, spike: 18, spike_group: 15, spike_wall: 12, rotating_wheel: 12, moving_spike: 12, platform_gap: 0, low_ceiling: 0 },
+  7: { tumbleweed: 5, sinkhole: 5, meerkat_pack: 5, vulture: 15, swinging_vine: 15, drone: 10, rolling_boulder: 15, rival_predator: 15, baobab_root: 10, gas_fee_wall: 10, falling_block: 10, rug_pull: 10, spike: 18, spike_group: 15, spike_wall: 15, rotating_wheel: 12, moving_spike: 12, platform_gap: 0, low_ceiling: 0 },
+  8: { tumbleweed: 5, sinkhole: 5, meerkat_pack: 5, vulture: 15, swinging_vine: 15, drone: 15, rolling_boulder: 15, rival_predator: 15, baobab_root: 15, gas_fee_wall: 10, falling_block: 10, rug_pull: 15, spike: 18, spike_group: 15, spike_wall: 15, rotating_wheel: 15, moving_spike: 15, platform_gap: 0, low_ceiling: 0 },
 };
 
 // Factory to create a concrete obstacle instance.
@@ -94,10 +103,15 @@ function makeObstacle(kind: ObstacleKind, W: number, groundY: number): Obstacle 
       return { x, y: groundY - 32, width: 36, height: 32, kind, category: 'crypto' };
     // Legacy types – keep `type` field for old drawing code.
     case 'spike':
+      return { x, y: groundY - 32, width: 24, height: 32, kind, category: 'ground', type: kind };
     case 'spike_group':
+      return { x, y: groundY - 32, width: 56, height: 32, kind, category: 'ground', type: kind };
     case 'spike_wall':
+      return { x, y: groundY - 64, width: 28, height: 64, kind, category: 'ground', type: kind };
     case 'rotating_wheel':
+      return { x, y: groundY - 120, width: 56, height: 56, kind, category: 'air', type: kind, angle: 0 };
     case 'moving_spike':
+      return { x, y: groundY - 60, width: 28, height: 32, kind, category: 'air', type: kind, moveDir: 1, moveRange: 80, moveOrigin: groundY - 60 };
     case 'platform_gap':
     case 'low_ceiling':
       return { x, y: groundY - 32, width: 24, height: 32, kind, category: 'ground', type: kind };
@@ -107,6 +121,8 @@ function makeObstacle(kind: ObstacleKind, W: number, groundY: number): Obstacle 
 }
 
 // Public API: choose obstacles for the current spawn tick.
+export type ObstacleType = ObstacleKind;
+
 export function getSpawnedObstacles(level: number, W: number, groundY: number, _score: number): Obstacle[] {
   const weights = spawnWeights[Math.min(level, 8)];
   const combo = level >= 6 && Math.random() < 0.15;
