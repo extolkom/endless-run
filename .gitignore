@@ -24,3 +24,6 @@ contract/typechain-types/
 # ─── Misc ───
 *.log
 .DS_Store
+
+.vercel
+.env*
