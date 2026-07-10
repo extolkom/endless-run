@@ -195,11 +195,29 @@ function drawPlayer(
         break;
       }
       case 'sinkhole': {
-        // Dark crater with a crack line that appears shortly before disappearing
-        ctx.fillStyle = '#2f2f2f';
-        ctx.beginPath(); ctx.arc(obs.width / 2, obs.height / 2, obs.width / 2, 0, Math.PI * 2); ctx.fill();
-        // crack (simple line)
-        ctx.strokeStyle = '#555'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, obs.height / 2); ctx.lineTo(obs.width, obs.height / 2); ctx.stroke();
+        // A pit sunk into the ground — shallow ellipse with a depth gradient
+        // and a glowing purple rim, so it reads as a hole, not a floating ball.
+        const cx = obs.width / 2;
+        const cy = obs.height / 2;
+        const rx = obs.width / 2;
+        const ry = obs.height / 2;
+
+        const grad = ctx.createRadialGradient(cx, cy, 1, cx, cy, rx);
+        grad.addColorStop(0, '#000000');
+        grad.addColorStop(0.55, '#0a0012');
+        grad.addColorStop(1, '#2a1044');
+        ctx.fillStyle = grad;
+        ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
+
+        // Glowing neon-purple rim to match the ground.
+        ctx.strokeStyle = PAL.purple; ctx.lineWidth = 2;
+        ctx.shadowColor = PAL.purple; ctx.shadowBlur = 8;
+        ctx.beginPath(); ctx.ellipse(cx, cy, rx - 1, ry - 1, 0, 0, Math.PI * 2); ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Faint near-edge highlight for a touch of depth.
+        ctx.strokeStyle = 'rgba(168,85,247,0.45)'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.ellipse(cx, cy + 1, rx * 0.7, ry * 0.55, 0, 0, Math.PI); ctx.stroke();
         break;
       }
       case 'meerkat_pack': {
