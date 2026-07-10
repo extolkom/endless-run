@@ -51,7 +51,7 @@ const COIN_INTERVAL_MS = 30000;       // 30 seconds between coins
 const FIRST_COIN_MS = 5000;        // first coin at 5 seconds
 const SPEEDUP_INTERVAL = 10000;       // speed up every 10 seconds
 const SPEED_INCREMENT = 0.8;
-const LIVES_COST_CELO = 3;           // cost to buy 10 more lives
+const LIVES_COST_CELO = 0.1;         // cost to buy 10 more lives
 const EXTRA_LIVES = 10;
 const MAX_LEVEL = 8;
 
@@ -868,7 +868,7 @@ function drawPlayer(
 
       setIsProcessingBuy(true);
       try {
-        const txHash = await sendCELO('0x54CfcB5DA23dB98762C3919093A9B230D6Ed429D', 3);
+        const txHash = await sendCELO('0x54CfcB5DA23dB98762C3919093A9B230D6Ed429D', 0.1);
         if (txHash) {
           // Transaction successful, add 10 lives
           const state = stateRef.current;
