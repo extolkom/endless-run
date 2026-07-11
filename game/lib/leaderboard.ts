@@ -53,7 +53,18 @@ export async function submitScoreOnChain(score: number): Promise<string | null> 
 
     const signer = await provider.getSigner();
     const contract = new ethers.Contract(LEADERBOARD_ADDRESS, LEADERBOARD_ABI, signer);
-    const tx = await contract.submitScore(BigInt(Math.floor(score)));
+
+    // MiniPay only accepts legacy (type-0) transactions and ignores EIP-1559
+    // fields, but ethers v6 defaults to EIP-1559. Under MiniPay, force a legacy
+    // tx with an explicit gasPrice. Other wallets keep ethers' default behaviour.
+    const overrides: ethers.Overrides = {};
+    if (window.ethereum?.isMiniPay) {
+      const feeData = await provider.getFeeData();
+      overrides.type = 0;
+      overrides.gasPrice = feeData.gasPrice ?? ethers.parseUnits('5', 'gwei');
+    }
+
+    const tx = await contract.submitScore(BigInt(Math.floor(score)), overrides);
     await tx.wait();
     return tx.hash as string;
   } catch (error) {

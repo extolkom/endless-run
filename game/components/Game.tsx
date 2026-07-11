@@ -590,15 +590,18 @@ function drawPlayer(
             return;
           }
 
-          // Request accounts
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          // MiniPay auto-connects and injects the account, so read it directly
+          // with eth_accounts (no prompt). Regular wallets (MetaMask, etc.) keep
+          // the existing eth_requestAccounts manual-approval flow — unchanged.
+          const isMinipay = window.ethereum.isMiniPay || false;
+          const accountsMethod = isMinipay ? 'eth_accounts' : 'eth_requestAccounts';
+          const accounts = await window.ethereum.request({ method: accountsMethod });
           if (!accounts || accounts.length === 0) {
             setIsLoading(false);
             return;
           }
 
           const address = accounts[0];
-          const isMinipay = window.ethereum.isMiniPay || false;
 
           // Get balance from Celo Mainnet RPC
           const balanceHex = await fetch('https://forno.celo.org', {
@@ -1432,7 +1435,8 @@ function drawPlayer(
                   GET {EXTRA_LIVES} LIVES<br />
                   <span style={{ color: PAL.coin }}>COSTS {LIVES_COST_CELO} CELO</span>
                 </div>
-                {!walletData.isConnected ? (
+                {/* MiniPay connects implicitly — never show a connect prompt there. */}
+                {!walletData.isConnected && !walletData.isMinipay ? (
                   <div style={{ color: '#888', fontSize: 5, fontFamily: '"Press Start 2P", monospace' }}>
                     CONNECT WALLET TO CONTINUE
                   </div>
