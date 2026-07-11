@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 import { NextRequest, NextResponse } from 'next/server';
+import { sameOrigin, verifySessionToken } from '@/lib/rewardAuth';
 
 const REWARD_WALLET_ADDRESS = '0x54CfcB5DA23dB98762C3919093A9B230D6Ed429D';
 const CELO_RPC_URL = 'https://forno.celo.org';
@@ -10,24 +11,14 @@ const REWARD_AMOUNT_CELO = '0.002';    // fixed payout per coin; any client `amo
 const MIN_WALLET_RESERVE_CELO = 0.05;  // stop paying out once the wallet drops below this
 const ADDRESS_COOLDOWN_MS = 4_000;     // min gap between payouts to the same address
 const MAX_PAYOUTS_PER_MINUTE = 30;     // global throttle across all recipients
+const MAX_PAYOUTS_PER_SESSION = 100;   // hard cap of coins paid per signed session token
 
 // ─── In-memory rate-limit state ─────────────────────────────────────────────────
 // NOTE: per-instance only. On serverless this resets on cold start and is not
 // shared across instances — for production-grade limits back this with Redis/KV.
 const lastPaidAt = new Map<string, number>();
 const recentPayouts: number[] = [];
-
-/** Only accept calls that originate from the game front-end itself. */
-function sameOrigin(request: NextRequest): boolean {
-  const origin = request.headers.get('origin');
-  const host = request.headers.get('host');
-  if (!origin || !host) return false;
-  try {
-    return new URL(origin).host === host;
-  } catch {
-    return false;
-  }
-}
+const sessionPayouts = new Map<string, number>(); // sid → payouts so far
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,7 +27,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
     }
 
-    const { to } = await request.json();
+    const { to, token } = await request.json();
 
     // Validate the recipient address (the client-supplied amount is intentionally ignored).
     if (!to || !ethers.isAddress(to)) {
@@ -47,8 +38,31 @@ export async function POST(request: NextRequest) {
     }
     const recipient = ethers.getAddress(to); // checksum-normalise for stable rate-limit keys
 
-    // ── Rate limiting ──
+    // ── Session token: proves the caller started a game via /api/game-session and
+    //    binds this payout to that wallet + session. Signed server-side, so the
+    //    client cannot forge it or point it at a different wallet. ──
     const now = Date.now();
+    const session = verifySessionToken(token, now);
+    if (!session) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid or expired game session' },
+        { status: 401 }
+      );
+    }
+    if (ethers.getAddress(session.addr) !== recipient) {
+      return NextResponse.json(
+        { success: false, error: 'Session does not match recipient' },
+        { status: 403 }
+      );
+    }
+    if ((sessionPayouts.get(session.sid) ?? 0) >= MAX_PAYOUTS_PER_SESSION) {
+      return NextResponse.json(
+        { success: false, error: 'Session payout limit reached' },
+        { status: 429 }
+      );
+    }
+
+    // ── Rate limiting ──
     if (now - (lastPaidAt.get(recipient) ?? 0) < ADDRESS_COOLDOWN_MS) {
       return NextResponse.json({ success: false, error: 'Too many requests' }, { status: 429 });
     }
@@ -89,6 +103,7 @@ export async function POST(request: NextRequest) {
     // Reserve the rate-limit slots BEFORE sending so concurrent calls can't slip past the caps.
     lastPaidAt.set(recipient, now);
     recentPayouts.push(now);
+    sessionPayouts.set(session.sid, (sessionPayouts.get(session.sid) ?? 0) + 1);
 
     // Get current gas price
     const feeData = await provider.getFeeData();

@@ -723,6 +723,7 @@ function drawPlayer(
     const gameStartRef = useRef(0);
     const shakeRef = useRef({ x: 0, y: 0, timer: 0 });
     const flashRef = useRef({ text: '', timer: 0, color: PAL.neon });
+    const sessionTokenRef = useRef<string | null>(null); // signed reward-session token
 
     const [uiScore, setUiScore] = useState(0);
     const [uiHighScore, setUiHighScore] = useState(0);
@@ -738,6 +739,30 @@ function drawPlayer(
     const [onChainTx, setOnChainTx] = useState('');
 
     const wallet = useWallet();
+
+    // Request a signed, short-lived reward-session token whenever a run starts
+    // with a connected wallet. /api/reward requires this token, so payouts are
+    // bound to the wallet + capped per session server-side.
+    useEffect(() => {
+      if (gamePhase !== 'playing' || !walletData.isConnected || !walletData.address) return;
+      let cancelled = false;
+      (async () => {
+        try {
+          const res = await fetch('/api/game-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ address: walletData.address }),
+          });
+          const data = await res.json().catch(() => ({ success: false }));
+          if (!cancelled && res.ok && data.success && data.token) {
+            sessionTokenRef.current = data.token;
+          }
+        } catch (err) {
+          console.error('Session token request error:', err);
+        }
+      })();
+      return () => { cancelled = true; };
+    }, [gamePhase, walletData.isConnected, walletData.address]);
 
     // Record a finished run on the CheetahChain leaderboard (real Celo tx).
     const saveScoreOnChain = useCallback(async (score: number) => {
@@ -869,28 +894,43 @@ function drawPlayer(
       setIsProcessingBuy(true);
       try {
         const txHash = await sendCELO('0x54CfcB5DA23dB98762C3919093A9B230D6Ed429D', 0.1);
-        if (txHash) {
-          // Transaction successful, add 10 lives
-          const state = stateRef.current;
-          state.lives += EXTRA_LIVES;
-          setUiLives(state.lives);
-          setShowBuyLives(false);
-          // Resume game
-          state.isOver = false;
-          state.isRunning = true;
-          playerRef.current.isDead = false;
-          const canvas = canvasRef.current;
-          if (canvas) {
-            const groundY = canvas.height * GROUND_RATIO;
-            playerRef.current.y = groundY - P_SIZE;
-            playerRef.current.vy = 0;
-          }
-          obstaclesRef.current = [];
-          setGamePhase('playing');
-          flashRef.current = { text: '✨ +10 LIVES!', timer: 1200, color: PAL.neon };
-        } else {
+        if (!txHash) {
           alert('Transaction failed');
+          return;
         }
+
+        // Never trust the wallet's word that the payment succeeded. The backend
+        // confirms this is a real, mined 0.1 CELO tx to the correct address,
+        // sent by this wallet, and not already redeemed — BEFORE granting lives.
+        const res = await fetch('/api/verify-lives', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ txHash, from: walletData.address }),
+        });
+        const data = await res.json().catch(() => ({ success: false }));
+        if (!res.ok || !data.success) {
+          alert(data.error || 'Payment could not be verified — lives not granted');
+          return;
+        }
+
+        // Verified on-chain — add 10 lives and resume.
+        const state = stateRef.current;
+        state.lives += EXTRA_LIVES;
+        setUiLives(state.lives);
+        setShowBuyLives(false);
+        // Resume game
+        state.isOver = false;
+        state.isRunning = true;
+        playerRef.current.isDead = false;
+        const canvas = canvasRef.current;
+        if (canvas) {
+          const groundY = canvas.height * GROUND_RATIO;
+          playerRef.current.y = groundY - P_SIZE;
+          playerRef.current.vy = 0;
+        }
+        obstaclesRef.current = [];
+        setGamePhase('playing');
+        flashRef.current = { text: '✨ +10 LIVES!', timer: 1200, color: PAL.neon };
       } catch (error) {
         console.error('Buy lives error:', error);
         alert('Error purchasing lives');
@@ -1064,6 +1104,7 @@ function drawPlayer(
                   body: JSON.stringify({
                     to: walletData.address,
                     amount: '0.002',
+                    token: sessionTokenRef.current,
                   }),
                 }).catch(err => console.error('Reward request error:', err));
               }
