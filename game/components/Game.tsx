@@ -51,7 +51,14 @@ const COIN_INTERVAL_MS = 30000;       // 30 seconds between coins
 const FIRST_COIN_MS = 5000;        // first coin at 5 seconds
 const SPEEDUP_INTERVAL = 10000;       // speed up every 10 seconds
 const SPEED_INCREMENT = 0.8;
-const LIVES_COST_CELO = 0.1;         // cost to buy 10 more lives
+const LIVES_COST_CELO = 0.1;         // cost to buy 10 more lives (native CELO path)
+// MiniPay is a stablecoin wallet — most users hold no native CELO, so there we
+// charge in USDm (Mento Dollar) instead. 0.05 USDm ≈ the real-world value of
+// 0.1 CELO (~$0.04 at ~$0.40/CELO), rounded to a clean number.
+const LIVES_COST_USDM = 0.05;
+// USDm / Mento Dollar on Celo mainnet — verified on-chain: symbol "USDm",
+// name "Mento Dollar", 18 decimals. NOT Mountain Protocol's USDM.
+const USDM_ADDRESS = '0x765DE816845861e75A25fCA122bb6898B8B1282a';
 const EXTRA_LIVES = 10;
 const MAX_LEVEL = 8;
 
@@ -419,7 +426,7 @@ function drawPlayer(
 
   // ─── HUD ──────────────────────────────────────────────────────────────────────
 
-  function drawHUD(ctx: CanvasRenderingContext2D, W: number, score: number, celoEarned: number, level: number, speed: number, lives: number, walletAddress: string = '', walletBalance: string = '0') {
+  function drawHUD(ctx: CanvasRenderingContext2D, W: number, score: number, celoEarned: number, level: number, speed: number, lives: number, walletAddress: string = '', walletBalance: string = '0', isMinipay: boolean = false) {
     ctx.imageSmoothingEnabled = false;
 
     // Score
@@ -438,7 +445,7 @@ function drawPlayer(
     if (walletAddress) {
       const walletStr = formatAddress(walletAddress);
       pixelText(ctx, walletStr, W - 140, 12, 6, '#8888ff');
-      pixelText(ctx, `${walletBalance} C`, W - 140, 24, 6, PAL.coin);
+      pixelText(ctx, `${walletBalance} ${isMinipay ? 'USDm' : 'C'}`, W - 140, 24, 6, PAL.coin);
     }
 
     // CELO top right (adjusted position)
@@ -577,6 +584,35 @@ function drawPlayer(
 
   // ─── Wallet Integration ───────────────────────────────────────────────────────
 
+  // Fetch a wallet's spendable balance, formatted to 4 dp. For MiniPay we read
+  // the USDm token balance (balanceOf) — MiniPay users typically hold no native
+  // CELO, so eth_getBalance would misleadingly show ~0. Everyone else reads the
+  // native CELO balance as before. Both USDm and CELO use 18 decimals.
+  async function fetchWalletBalance(address: string, isMinipay: boolean): Promise<string> {
+    const body = isMinipay
+      ? {
+          jsonrpc: '2.0',
+          method: 'eth_call',
+          // balanceOf(address): selector 0x70a08231 + 32-byte-padded address.
+          params: [
+            { to: USDM_ADDRESS, data: '0x70a08231' + address.toLowerCase().replace(/^0x/, '').padStart(64, '0') },
+            'latest',
+          ],
+          id: 1,
+        }
+      : { jsonrpc: '2.0', method: 'eth_getBalance', params: [address, 'latest'], id: 1 };
+
+    const hex = await fetch('https://forno.celo.org', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+      .then(r => r.json())
+      .then(d => d.result || '0x0');
+
+    return (Number(BigInt(hex)) / 1e18).toFixed(4);
+  }
+
   // useWallet hook
   function useWallet() {
     const [wallet, setWallet] = useState({ address: '', balance: '0', isConnected: false, isMinipay: false });
@@ -603,23 +639,8 @@ function drawPlayer(
 
           const address = accounts[0];
 
-          // Get balance from Celo Mainnet RPC
-          const balanceHex = await fetch('https://forno.celo.org', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              jsonrpc: '2.0',
-              method: 'eth_getBalance',
-              params: [address, 'latest'],
-              id: 1,
-            }),
-          })
-            .then(r => r.json())
-            .then(d => d.result || '0x0');
-
-          // Convert hex to decimal and format as CELO
-          const balanceWei = BigInt(balanceHex);
-          const balance = (Number(balanceWei) / 1e18).toFixed(4);
+          // USDm balance for MiniPay, native CELO balance otherwise.
+          const balance = await fetchWalletBalance(address, isMinipay);
 
           setWallet({ address, balance, isConnected: true, isMinipay });
         } catch (error) {
@@ -637,21 +658,7 @@ function drawPlayer(
       if (!wallet.isConnected) return;
       const interval = setInterval(async () => {
         try {
-          const balanceHex = await fetch('https://forno.celo.org', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              jsonrpc: '2.0',
-              method: 'eth_getBalance',
-              params: [wallet.address, 'latest'],
-              id: 1,
-            }),
-          })
-            .then(r => r.json())
-            .then(d => d.result || '0x0');
-
-          const balanceWei = BigInt(balanceHex);
-          const balance = (Number(balanceWei) / 1e18).toFixed(4);
+          const balance = await fetchWalletBalance(wallet.address, wallet.isMinipay);
           setWallet(w => ({ ...w, balance }));
         } catch (error) {
           console.error('Balance refresh error:', error);
@@ -659,7 +666,7 @@ function drawPlayer(
       }, 10000);
 
       return () => clearInterval(interval);
-    }, [wallet.address, wallet.isConnected]);
+    }, [wallet.address, wallet.isConnected, wallet.isMinipay]);
 
     return wallet;
   }
@@ -687,6 +694,44 @@ function drawPlayer(
       return txHash;
     } catch (error) {
       console.error('Send CELO error:', error);
+      return null;
+    }
+  }
+
+  // Send USDm (Mento Dollar) — an ERC-20 transfer, used for MiniPay where the
+  // user pays in stablecoin rather than native CELO. Instead of a native value
+  // transfer, this calls transfer(to, amount) on the USDm token contract:
+  //   to    = token contract, value = 0, data = 0xa9059cbb + to + amount
+  // USDm uses 18 decimals (same as CELO), so the amount scaling matches.
+  async function sendUSDm(to: string, amountUsdm: number): Promise<string | null> {
+    if (!window.ethereum) {
+      console.error('Ethereum not available');
+      return null;
+    }
+
+    try {
+      const amountWei = BigInt(Math.round(amountUsdm * 1e18));
+      // ABI-encode transfer(address,uint256): 4-byte selector + two 32-byte words.
+      const selector = 'a9059cbb';
+      const toWord = to.toLowerCase().replace(/^0x/, '').padStart(64, '0');
+      const amountWord = amountWei.toString(16).padStart(64, '0');
+      const data = '0x' + selector + toWord + amountWord;
+
+      const txHash = await window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [
+          {
+            from: window.ethereum.selectedAddress,
+            to: USDM_ADDRESS,     // call the token contract, not the recipient
+            value: '0x0',         // no native value moves in an ERC-20 transfer
+            data,
+            chainId: 42220, // Celo Mainnet
+          },
+        ],
+      });
+      return txHash;
+    } catch (error) {
+      console.error('Send USDm error:', error);
       return null;
     }
   }
@@ -896,15 +941,20 @@ function drawPlayer(
 
       setIsProcessingBuy(true);
       try {
-        const txHash = await sendCELO('0x54CfcB5DA23dB98762C3919093A9B230D6Ed429D', 0.1);
+        // MiniPay users pay in USDm (ERC-20); everyone else pays in native CELO.
+        const RECEIVER = '0x54CfcB5DA23dB98762C3919093A9B230D6Ed429D';
+        const txHash = walletData.isMinipay
+          ? await sendUSDm(RECEIVER, LIVES_COST_USDM)
+          : await sendCELO(RECEIVER, LIVES_COST_CELO);
         if (!txHash) {
           alert('Transaction failed');
           return;
         }
 
         // Never trust the wallet's word that the payment succeeded. The backend
-        // confirms this is a real, mined 0.1 CELO tx to the correct address,
-        // sent by this wallet, and not already redeemed — BEFORE granting lives.
+        // confirms this is a real, mined payment (0.1 CELO, or the USDm equivalent
+        // for MiniPay) to the correct address, sent by this wallet, and not already
+        // redeemed — BEFORE granting lives. It auto-detects the asset from the tx.
         const res = await fetch('/api/verify-lives', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -940,7 +990,7 @@ function drawPlayer(
       } finally {
         setIsProcessingBuy(false);
       }
-    }, [walletData.isConnected, walletData.address]);
+    }, [walletData.isConnected, walletData.address, walletData.isMinipay]);
 
     // Main loop
     useEffect(() => {
@@ -1160,7 +1210,7 @@ function drawPlayer(
         }
 
         // ── HUD ──
-        drawHUD(ctx, W, state.score, state.celoEarned, state.level, state.speed, state.lives, walletData.address, walletData.balance);
+        drawHUD(ctx, W, state.score, state.celoEarned, state.level, state.speed, state.lives, walletData.address, walletData.balance, walletData.isMinipay);
 
         rafRef.current = requestAnimationFrame(loop);
       };
@@ -1433,7 +1483,9 @@ function drawPlayer(
                 }}>CONTINUE?</div>
                 <div style={{ color: '#888', fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginBottom: 10, lineHeight: 2 }}>
                   GET {EXTRA_LIVES} LIVES<br />
-                  <span style={{ color: PAL.coin }}>COSTS {LIVES_COST_CELO} CELO</span>
+                  <span style={{ color: PAL.coin }}>
+                    COSTS {walletData.isMinipay ? `${LIVES_COST_USDM} USDm` : `${LIVES_COST_CELO} CELO`}
+                  </span>
                 </div>
                 {/* MiniPay connects implicitly — never show a connect prompt there. */}
                 {!walletData.isConnected && !walletData.isMinipay ? (
