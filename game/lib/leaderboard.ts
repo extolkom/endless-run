@@ -29,18 +29,24 @@ export interface TopScore {
   timestamp: number;
 }
 
+export type ScoreSubmissionResult =
+  | { status: 'saved'; txHash: string }
+  | { status: 'declined' }
+  | { status: 'no-gas' }
+  | { status: 'error' };
+
 /**
  * Record a finished run on-chain. Sends a real Celo transaction via the
- * connected wallet (MiniPay / MetaMask). Returns the tx hash, or null if it
- * was skipped (no wallet / not configured) or failed.
+ * connected wallet (MiniPay / MetaMask). Returns a structured result so the UI
+ * can distinguish declined signatures, lack of gas, and genuine failures.
  */
-export async function submitScoreOnChain(score: number): Promise<string | null> {
-  if (typeof window === 'undefined' || !window.ethereum) return null;
+export async function submitScoreOnChain(score: number): Promise<ScoreSubmissionResult> {
+  if (typeof window === 'undefined' || !window.ethereum) return { status: 'error' };
   if (!LEADERBOARD_ADDRESS) {
     console.warn('LEADERBOARD_ADDRESS not set — deploy the contract and paste the address.');
-    return null;
+    return { status: 'error' };
   }
-  if (!Number.isFinite(score) || score <= 0) return null;
+  if (!Number.isFinite(score) || score <= 0) return { status: 'error' };
 
   try {
     const provider = new ethers.BrowserProvider(window.ethereum);
@@ -59,8 +65,8 @@ export async function submitScoreOnChain(score: number): Promise<string | null> 
     }
 
     // MiniPay users typically hold no native CELO, so a normal gas-in-CELO tx
-    // fails (the likely cause of "NOT SAVED (TX SKIPPED)"). Pay gas in USDm via
-    // Celo's feeCurrency field. ethers v6 dropped Celo support and would strip
+    // fails (the likely cause of the old message). Pay gas in USDm via Celo's
+    // feeCurrency field. ethers v6 dropped Celo support and would strip
     // feeCurrency from its Overrides, so for MiniPay we bypass the Contract
     // helper and send a raw eth_sendTransaction that carries feeCurrency. Let
     // MiniPay build the fee-currency (CIP-64) tx and price gas itself.
@@ -80,11 +86,9 @@ export async function submitScoreOnChain(score: number): Promise<string | null> 
           },
         ],
       });
-      // Preserve the "hash only on confirmed success" contract the caller relies
-      // on to show SAVED vs NOT SAVED.
       const receipt = await provider.waitForTransaction(hash, 1);
-      if (!receipt || receipt.status !== 1) return null;
-      return hash;
+      if (!receipt || receipt.status !== 1) return { status: 'error' };
+      return { status: 'saved', txHash: hash };
     }
 
     // ── Non-MiniPay path (unchanged) ──
@@ -92,10 +96,17 @@ export async function submitScoreOnChain(score: number): Promise<string | null> 
     const contract = new ethers.Contract(LEADERBOARD_ADDRESS, LEADERBOARD_ABI, signer);
     const tx = await contract.submitScore(BigInt(Math.floor(score)));
     await tx.wait();
-    return tx.hash as string;
+    return { status: 'saved', txHash: tx.hash as string };
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (message.includes('user rejected') || message.includes('declined')) {
+      return { status: 'declined' };
+    }
+    if (message.includes('insufficient funds') || message.includes('gas')) {
+      return { status: 'no-gas' };
+    }
     console.error('submitScoreOnChain error:', error);
-    return null;
+    return { status: 'error' };
   }
 }
 

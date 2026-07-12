@@ -2,7 +2,7 @@
 
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { submitScoreOnChain } from '../lib/leaderboard';
+import { submitScoreOnChain, fetchTopScores, type TopScore } from '../lib/leaderboard';
 
 // Ethereum window type
 declare global {
@@ -782,8 +782,11 @@ function drawPlayer(
     const [showBuyLives, setShowBuyLives] = useState(false);
     const [walletData, setWalletData] = useState({ address: '', balance: '0', isConnected: false, isMinipay: false });
     const [isProcessingBuy, setIsProcessingBuy] = useState(false);
-    const [onChainStatus, setOnChainStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+    const [onChainStatus, setOnChainStatus] = useState<'idle' | 'saving' | 'saved' | 'error' | 'declined' | 'no-gas'>('idle');
     const [onChainTx, setOnChainTx] = useState('');
+    const [showLeaderboard, setShowLeaderboard] = useState(false);
+    const [topScores, setTopScores] = useState<TopScore[]>([]);
+    const [lbLoading, setLbLoading] = useState(false);
 
     const wallet = useWallet();
 
@@ -811,15 +814,32 @@ function drawPlayer(
       return () => { cancelled = true; };
     }, [gamePhase, walletData.isConnected, walletData.address]);
 
+    const openLeaderboard = useCallback(async () => {
+      setShowLeaderboard(true);
+      setLbLoading(true);
+      try {
+        const scores = await fetchTopScores();
+        setTopScores(scores.slice(0, 5));
+      } catch {
+        setTopScores([]);
+      } finally {
+        setLbLoading(false);
+      }
+    }, []);
+
     // Record a finished run on the CheetahChain leaderboard (real Celo tx).
     const saveScoreOnChain = useCallback(async (score: number) => {
       if (!window.ethereum || score <= 0) return;
       setOnChainStatus('saving');
       setOnChainTx('');
-      const hash = await submitScoreOnChain(score);
-      if (hash) {
+      const result = await submitScoreOnChain(score);
+      if (result.status === 'saved' && result.txHash) {
         setOnChainStatus('saved');
-        setOnChainTx(hash);
+        setOnChainTx(result.txHash);
+      } else if (result.status === 'declined') {
+        setOnChainStatus('declined');
+      } else if (result.status === 'no-gas') {
+        setOnChainStatus('no-gas');
       } else {
         setOnChainStatus('error');
       }
@@ -884,6 +904,7 @@ function drawPlayer(
       setShowBuyLives(false);
       setOnChainStatus('idle');
       setOnChainTx('');
+      setShowLeaderboard(false);
     }, []);
 
     const endGame = useCallback((fromLife = false) => {
@@ -1444,16 +1465,18 @@ function drawPlayer(
               {/* On-chain leaderboard status */}
               {onChainStatus !== 'idle' && (
                 <div style={{
-                  background: '#000814', border: `2px solid ${PAL.cyan}`,
+                  background: '#000814', border: `2px solid ${onChainStatus === 'saved' ? PAL.cyan : PAL.red}`,
                   padding: '8px 10px', marginBottom: 16,
                 }}>
                   <div style={{
-                    color: onChainStatus === 'error' ? PAL.red : PAL.cyan,
+                    color: onChainStatus === 'saved' ? PAL.cyan : PAL.red,
                     fontSize: 6, fontFamily: '"Press Start 2P", monospace', lineHeight: 1.8,
                   }}>
                     {onChainStatus === 'saving' && '⛓ SAVING RUN ON-CHAIN...'}
                     {onChainStatus === 'saved' && '⛓ SAVED ON CELO ✓'}
-                    {onChainStatus === 'error' && '⛓ NOT SAVED (TX SKIPPED)'}
+                    {onChainStatus === 'declined' && '⛓ DECLINED BY WALLET'}
+                    {onChainStatus === 'no-gas' && '⛓ NO CELO FOR GAS'}
+                    {onChainStatus === 'error' && '⛓ NOT SAVED'}
                   </div>
                   {onChainStatus === 'saved' && onChainTx && (
                     <a
@@ -1513,6 +1536,19 @@ function drawPlayer(
                 )}
               </div>
 
+              <button
+                onClick={openLeaderboard}
+                style={{
+                  ...pixelBtn('#FFD700', '#000', true),
+                  width: '100%',
+                  marginBottom: 12,
+                  boxShadow: '0 0 18px #FFD70055, 4px 4px 0 #000',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = ''; }}>
+                🏆 LEADERBOARD
+              </button>
+
               {/* Buttons */}
               <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
                 <button onClick={() => startGame()} style={pixelBtn(PAL.neon)}
@@ -1520,12 +1556,105 @@ function drawPlayer(
                   onMouseLeave={e => { e.currentTarget.style.transform = ''; }}>
                   ▶ RETRY
                 </button>
-                <button onClick={() => setGamePhase('idle')} style={pixelBtn('#222', '#fff')}
+                <button onClick={() => { setShowLeaderboard(false); setGamePhase('idle'); }} style={pixelBtn('#222', '#fff')}
                   onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; }}
                   onMouseLeave={e => { e.currentTarget.style.transform = ''; }}>
                   MENU
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {showLeaderboard && (
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'rgba(0,0,0,0.93)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 16,
+            zIndex: 30,
+            animation: 'fadeIn 0.2s ease',
+          }}>
+            <div style={{
+              width: '100%', maxWidth: 360,
+              background: '#0b0b14',
+              border: '3px solid #FFD700',
+              boxShadow: '0 0 25px #FFD70055, 6px 6px 0 #000',
+              padding: 16,
+              color: '#fff',
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <div style={{ color: '#FFD700', fontSize: 10, lineHeight: 1.4 }}>
+                  🏆 LEADERBOARD<br />TOP 5 CHEETAHS
+                </div>
+                <button
+                  onClick={() => setShowLeaderboard(false)}
+                  style={{
+                    ...pixelBtn('#222', '#fff', true),
+                    padding: '8px 10px',
+                    fontSize: 8,
+                  }}
+                >✕</button>
+              </div>
+
+              {lbLoading ? (
+                <div style={{ padding: '24px 0', textAlign: 'center', color: PAL.cyan, fontSize: 8 }}>
+                  ⏳ LOADING...
+                </div>
+              ) : topScores.length === 0 ? (
+                <div style={{ padding: '24px 0', textAlign: 'center', color: '#888', fontSize: 7, lineHeight: 2 }}>
+                  NO RUNS YET
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {topScores.map((entry, index) => {
+                    const isCurrentPlayer = !!walletData.address && entry.player.toLowerCase() === walletData.address.toLowerCase();
+                    const rankColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
+                    const rankIcon = index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`;
+                    return (
+                      <div
+                        key={`${entry.player}-${entry.timestamp}-${index}`}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 10,
+                          padding: '10px 10px',
+                          background: isCurrentPlayer ? '#081820' : '#11111c',
+                          border: `2px solid ${index < 3 ? rankColors[index] : '#2a2a3a'}`,
+                          boxShadow: index < 3 ? `0 0 10px ${rankColors[index]}33` : 'none',
+                        }}
+                      >
+                        <div style={{
+                          width: 34, height: 34,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          background: index < 3 ? '#1a1400' : '#111',
+                          color: index < 3 ? rankColors[index] : '#aaa',
+                          fontSize: index < 3 ? 12 : 10,
+                          border: `2px solid ${index < 3 ? rankColors[index] : '#444'}`,
+                        }}>{rankIcon}</div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center', marginBottom: 4 }}>
+                            <div style={{ color: isCurrentPlayer ? PAL.neon : '#fff', fontSize: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {formatAddress(entry.player)}{isCurrentPlayer ? ' · YOU' : ''}
+                            </div>
+                            <div style={{ color: PAL.amber, fontSize: 6 }}>{entry.score}</div>
+                          </div>
+                          <div style={{ color: '#777', fontSize: 5 }}>
+                            {new Date(entry.timestamp * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              <button
+                onClick={() => setShowLeaderboard(false)}
+                style={{
+                  ...pixelBtn(PAL.neon, '#000', true),
+                  width: '100%',
+                  marginTop: 14,
+                }}
+              >BACK</button>
             </div>
           </div>
         )}
