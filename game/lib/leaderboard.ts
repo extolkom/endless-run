@@ -7,6 +7,13 @@ export const LEADERBOARD_ADDRESS = '0xaA713E46cb662d8234d90Fc7D995f0f9A49dC3ea';
 export const CELO_CHAIN_ID = 42220;
 const CELO_CHAIN_ID_HEX = '0xa4ec'; // 42220
 
+// USDm / Mento Dollar on Celo mainnet — verified on-chain: symbol "USDm",
+// name "Mento Dollar", 18 decimals. NOT Mountain Protocol's USDM. USDm is a
+// registered Celo fee currency, so MiniPay can pay gas in it. (Same address is
+// duplicated in Game.tsx and api/verify-lives/route.ts — kept local per the
+// existing pattern rather than sharing a module in this pass.)
+const USDM_ADDRESS = '0x765DE816845861e75A25fCA122bb6898B8B1282a';
+
 export const LEADERBOARD_ABI = [
   'function submitScore(uint256 score) external',
   'function getTopScores() view returns (tuple(address player, uint128 score, uint64 timestamp)[])',
@@ -51,20 +58,39 @@ export async function submitScoreOnChain(score: number): Promise<string | null> 
       }
     }
 
-    const signer = await provider.getSigner();
-    const contract = new ethers.Contract(LEADERBOARD_ADDRESS, LEADERBOARD_ABI, signer);
-
-    // MiniPay only accepts legacy (type-0) transactions and ignores EIP-1559
-    // fields, but ethers v6 defaults to EIP-1559. Under MiniPay, force a legacy
-    // tx with an explicit gasPrice. Other wallets keep ethers' default behaviour.
-    const overrides: ethers.Overrides = {};
+    // MiniPay users typically hold no native CELO, so a normal gas-in-CELO tx
+    // fails (the likely cause of "NOT SAVED (TX SKIPPED)"). Pay gas in USDm via
+    // Celo's feeCurrency field. ethers v6 dropped Celo support and would strip
+    // feeCurrency from its Overrides, so for MiniPay we bypass the Contract
+    // helper and send a raw eth_sendTransaction that carries feeCurrency. Let
+    // MiniPay build the fee-currency (CIP-64) tx and price gas itself.
     if (window.ethereum?.isMiniPay) {
-      const feeData = await provider.getFeeData();
-      overrides.type = 0;
-      overrides.gasPrice = feeData.gasPrice ?? ethers.parseUnits('5', 'gwei');
+      const from = await (await provider.getSigner()).getAddress();
+      const iface = new ethers.Interface(LEADERBOARD_ABI);
+      const data = iface.encodeFunctionData('submitScore', [BigInt(Math.floor(score))]);
+      const hash: string = await window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [
+          {
+            from,
+            to: LEADERBOARD_ADDRESS,
+            data,
+            feeCurrency: USDM_ADDRESS, // pay gas in USDm, not native CELO
+            chainId: CELO_CHAIN_ID,
+          },
+        ],
+      });
+      // Preserve the "hash only on confirmed success" contract the caller relies
+      // on to show SAVED vs NOT SAVED.
+      const receipt = await provider.waitForTransaction(hash, 1);
+      if (!receipt || receipt.status !== 1) return null;
+      return hash;
     }
 
-    const tx = await contract.submitScore(BigInt(Math.floor(score)), overrides);
+    // ── Non-MiniPay path (unchanged) ──
+    const signer = await provider.getSigner();
+    const contract = new ethers.Contract(LEADERBOARD_ADDRESS, LEADERBOARD_ABI, signer);
+    const tx = await contract.submitScore(BigInt(Math.floor(score)));
     await tx.wait();
     return tx.hash as string;
   } catch (error) {

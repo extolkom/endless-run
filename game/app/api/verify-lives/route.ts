@@ -7,7 +7,7 @@ const LIVES_RECEIVER_ADDRESS = '0x54CfcB5DA23dB98762C3919093A9B230D6Ed429D';
 const LIVES_PRICE_CELO = '0.1';
 // MiniPay pays in USDm (Mento Dollar, an ERC-20) instead of native CELO. Price
 // mirrors the client's LIVES_COST_USDM. USDm uses 18 decimals, same as CELO.
-const LIVES_PRICE_USDM = '0.05';
+const LIVES_PRICE_USDM = '0.01';
 const USDM_ADDRESS = '0x765DE816845861e75A25fCA122bb6898B8B1282a';
 // Minimal ABI to decode the ERC-20 Transfer event from the tx receipt logs.
 const ERC20_TRANSFER_IFACE = new ethers.Interface([

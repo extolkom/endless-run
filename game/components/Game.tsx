@@ -53,9 +53,8 @@ const SPEEDUP_INTERVAL = 10000;       // speed up every 10 seconds
 const SPEED_INCREMENT = 0.8;
 const LIVES_COST_CELO = 0.1;         // cost to buy 10 more lives (native CELO path)
 // MiniPay is a stablecoin wallet — most users hold no native CELO, so there we
-// charge in USDm (Mento Dollar) instead. 0.05 USDm ≈ the real-world value of
-// 0.1 CELO (~$0.04 at ~$0.40/CELO), rounded to a clean number.
-const LIVES_COST_USDM = 0.05;
+// charge in USDm (Mento Dollar) instead. Set low (0.01 USDm) for live testing.
+const LIVES_COST_USDM = 0.01;
 // USDm / Mento Dollar on Celo mainnet — verified on-chain: symbol "USDm",
 // name "Mento Dollar", 18 decimals. NOT Mountain Protocol's USDM.
 const USDM_ADDRESS = '0x765DE816845861e75A25fCA122bb6898B8B1282a';
