@@ -148,6 +148,15 @@ export async function POST(request: NextRequest) {
 
     // Send the payout. MiniPay players get an ERC-20 USDm transfer; everyone else
     // gets the original native CELO transfer (unchanged).
+    if (payInUsdm) {
+      console.error('[reward] USDm payout attempt', {
+        recipient,
+        rewardWallet: signer.address,
+        amountUsdmWei: amountUsdmWei.toString(),
+        gasPrice: gasPrice.toString(),
+        gasLimit: USDM_TRANSFER_GAS_LIMIT.toString(),
+      });
+    }
     const tx = payInUsdm
       ? await usdm.transfer(recipient, amountUsdmWei, { gasPrice, gasLimit: USDM_TRANSFER_GAS_LIMIT })
       : await signer.sendTransaction({
@@ -157,8 +166,11 @@ export async function POST(request: NextRequest) {
           gasLimit: 21000, // Standard gas limit for simple transfers
         });
 
+    console.error('[reward] payout tx submitted', { txHash: tx.hash, payInUsdm, recipient });
+
     // Wait for transaction to be mined
     const receipt = await tx.wait();
+    console.error('[reward] payout receipt', { txHash: tx.hash, receiptStatus: receipt?.status, blockNumber: receipt?.blockNumber });
 
     return NextResponse.json({
       success: true,

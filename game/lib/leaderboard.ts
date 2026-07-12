@@ -86,9 +86,14 @@ export async function submitScoreOnChain(score: number): Promise<ScoreSubmission
           },
         ],
       });
-      const receipt = await provider.waitForTransaction(hash, 1);
-      if (!receipt || receipt.status !== 1) return { status: 'error' };
-      return { status: 'saved', txHash: hash };
+      try {
+        const receipt = await provider.waitForTransaction(hash, 1);
+        if (!receipt || receipt.status !== 1) return { status: 'error' };
+        return { status: 'saved', txHash: hash };
+      } catch (waitError) {
+        console.error('[leaderboard] MiniPay waitForTransaction error', waitError);
+        return { status: 'error' };
+      }
     }
 
     // ── Non-MiniPay path (unchanged) ──
@@ -99,13 +104,13 @@ export async function submitScoreOnChain(score: number): Promise<ScoreSubmission
     return { status: 'saved', txHash: tx.hash as string };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
+    console.error('[leaderboard] submitScoreOnChain catch-all', error);
     if (message.includes('user rejected') || message.includes('declined')) {
       return { status: 'declined' };
     }
     if (message.includes('insufficient funds') || message.includes('gas')) {
       return { status: 'no-gas' };
     }
-    console.error('submitScoreOnChain error:', error);
     return { status: 'error' };
   }
 }
