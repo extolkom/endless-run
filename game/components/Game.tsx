@@ -1334,7 +1334,7 @@ function drawPlayer(
                 textShadow: `0 0 20px ${PAL.neon}, 2px 2px 0 #000`,
                 animation: 'glow 2s infinite',
                 marginBottom: 2, lineHeight: 1.4,
-              }}>SWIFT RUN</div>
+              }}>ENDLES RUN</div>
               <div style={{
                 color: PAL.coin, fontSize: 7,
                 fontFamily: '"Press Start 2P", monospace',
