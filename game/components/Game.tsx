@@ -1157,6 +1157,9 @@ function drawPlayer(
                     to: walletData.address,
                     amount: '0.002',
                     token: sessionTokenRef.current,
+                    // MiniPay players are paid in USDm; the server enforces the
+                    // amount and only uses this flag to pick the payout currency.
+                    isMiniPay: walletData.isMinipay,
                   }),
                 }).catch(err => console.error('Reward request error:', err));
               }

@@ -13,6 +13,20 @@ const ADDRESS_COOLDOWN_MS = 4_000;     // min gap between payouts to the same ad
 const MAX_PAYOUTS_PER_MINUTE = 30;     // global throttle across all recipients
 const MAX_PAYOUTS_PER_SESSION = 100;   // hard cap of coins paid per signed session token
 
+// ─── USDm (MiniPay) payout path ─────────────────────────────────────────────────
+// MiniPay users hold stablecoin, not native CELO, so we pay their coin rewards in
+// USDm (Mento Dollar, an ERC-20) instead. Same token the buy-lives flow uses.
+const REWARD_AMOUNT_USDM = '0.002';    // fixed USDm payout per coin (mirrors REWARD_AMOUNT_CELO)
+const MIN_WALLET_RESERVE_USDM = 0.01;  // stop paying USDm once the wallet drops below this
+const USDM_ADDRESS = '0x765DE816845861e75A25fCA122bb6898B8B1282a';
+const USDM_ABI = [
+  'function transfer(address to, uint256 value) returns (bool)',
+  'function balanceOf(address owner) view returns (uint256)',
+];
+// Gas limit for an ERC-20 transfer() (gas is paid in native CELO). Used both to
+// guard the wallet's CELO balance up front and as the actual tx gas limit.
+const USDM_TRANSFER_GAS_LIMIT = BigInt(100000);
+
 // ─── In-memory rate-limit state ─────────────────────────────────────────────────
 // NOTE: per-instance only. On serverless this resets on cold start and is not
 // shared across instances — for production-grade limits back this with Redis/KV.
@@ -27,7 +41,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
     }
 
-    const { to, token } = await request.json();
+    const { to, token, isMiniPay } = await request.json();
+    // Client-supplied hint that the player is on MiniPay (a stablecoin wallet).
+    // Low stakes if spoofed: the worst case is a reward paid in the wrong currency,
+    // never extra funds — the amount and recipient stay server-enforced either way.
+    const payInUsdm = isMiniPay === true;
 
     // Validate the recipient address (the client-supplied amount is intentionally ignored).
     if (!to || !ethers.isAddress(to)) {
@@ -90,14 +108,37 @@ export async function POST(request: NextRequest) {
       console.warn('REWARD_PRIVATE_KEY does not match the expected REWARD_WALLET_ADDRESS');
     }
 
-    // Server-enforced amount — never trust the client for the payout size.
-    const amountWei = ethers.parseUnits(REWARD_AMOUNT_CELO, 18);
+    // Server-enforced amounts — never trust the client for the payout size.
+    const amountCeloWei = ethers.parseUnits(REWARD_AMOUNT_CELO, 18);
+    const amountUsdmWei = ethers.parseUnits(REWARD_AMOUNT_USDM, 18);
+    const usdm = new ethers.Contract(USDM_ADDRESS, USDM_ABI, signer);
 
-    // Keep a reserve so a runaway/abused flow can never zero the wallet.
-    const balance = await provider.getBalance(signer.address);
-    const reserveWei = ethers.parseUnits(String(MIN_WALLET_RESERVE_CELO), 18);
-    if (balance - amountWei < reserveWei) {
-      return NextResponse.json({ success: false, error: 'Reward pool depleted' }, { status: 503 });
+    // Current gas price (gas is paid in native CELO for both payout paths).
+    const feeData = await provider.getFeeData();
+    const gasPrice = feeData.gasPrice || ethers.parseUnits('1', 'gwei');
+
+    // Keep a reserve so a runaway/abused flow can never zero the wallet. Each path
+    // checks the balance of the asset it actually pays out (USDm vs native CELO).
+    if (payInUsdm) {
+      const usdmBalance: bigint = await usdm.balanceOf(signer.address);
+      const reserveWei = ethers.parseUnits(String(MIN_WALLET_RESERVE_USDM), 18);
+      if (usdmBalance - amountUsdmWei < reserveWei) {
+        return NextResponse.json({ success: false, error: 'Reward pool depleted (USDm)' }, { status: 503 });
+      }
+      // Gas is still paid in native CELO on the USDm path. Verify the wallet can
+      // cover the transfer()'s gas up front, so we fail early with a clear error
+      // instead of at broadcast time when CELO runs low.
+      const nativeBalance = await provider.getBalance(signer.address);
+      const gasCostWei = gasPrice * USDM_TRANSFER_GAS_LIMIT;
+      if (nativeBalance < gasCostWei) {
+        return NextResponse.json({ success: false, error: 'Insufficient CELO for gas' }, { status: 503 });
+      }
+    } else {
+      const balance = await provider.getBalance(signer.address);
+      const reserveWei = ethers.parseUnits(String(MIN_WALLET_RESERVE_CELO), 18);
+      if (balance - amountCeloWei < reserveWei) {
+        return NextResponse.json({ success: false, error: 'Reward pool depleted' }, { status: 503 });
+      }
     }
 
     // Reserve the rate-limit slots BEFORE sending so concurrent calls can't slip past the caps.
@@ -105,17 +146,16 @@ export async function POST(request: NextRequest) {
     recentPayouts.push(now);
     sessionPayouts.set(session.sid, (sessionPayouts.get(session.sid) ?? 0) + 1);
 
-    // Get current gas price
-    const feeData = await provider.getFeeData();
-    const gasPrice = feeData.gasPrice || ethers.parseUnits('1', 'gwei');
-
-    // Create and send transaction
-    const tx = await signer.sendTransaction({
-      to: recipient,
-      value: amountWei,
-      gasPrice,
-      gasLimit: 21000, // Standard gas limit for simple transfers
-    });
+    // Send the payout. MiniPay players get an ERC-20 USDm transfer; everyone else
+    // gets the original native CELO transfer (unchanged).
+    const tx = payInUsdm
+      ? await usdm.transfer(recipient, amountUsdmWei, { gasPrice, gasLimit: USDM_TRANSFER_GAS_LIMIT })
+      : await signer.sendTransaction({
+          to: recipient,
+          value: amountCeloWei,
+          gasPrice,
+          gasLimit: 21000, // Standard gas limit for simple transfers
+        });
 
     // Wait for transaction to be mined
     const receipt = await tx.wait();
