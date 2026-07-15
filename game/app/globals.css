@@ -7,4 +7,12 @@
 }
 
 :root {
-  --green-deep:   #050; }
+  --green-deep: #050;
+  --ninja-bg: #040a1a;
+  --ninja-bg-secondary: #0b1732;
+  --ninja-accent-primary: #39c3ff;
+  --ninja-accent-secondary: #60a8ff;
+  --ninja-text: #e6f5ff;
+  --ninja-success: #50d892;
+  --ninja-error: #ff5a6d;
+}
