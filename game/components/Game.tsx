@@ -88,7 +88,20 @@ const PAL = {
   cyan: '#22d3ee',
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+const NINJA_THEME = {
+  bg: '#040a1a',
+  bgSecondary: '#0b1732',
+  accentPrimary: '#39c3ff',
+  accentSecondary: '#60a8ff',
+  text: '#e6f5ff',
+  success: '#50d892',
+  error: '#ff5a6d',
+};
+
+const FONT_FAMILY = {
+  display: '"Vampire Wars", "Press Start 2P", monospace',
+  fallback: '"Press Start 2P", monospace',
+};
 
 function px(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, color: string) {
   ctx.fillStyle = color;
