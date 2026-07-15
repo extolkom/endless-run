@@ -98,7 +98,10 @@ const NINJA_THEME = {
   error: '#ff5a6d',
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+const FONT_FAMILY = {
+  display: '"Vampire Wars", "Press Start 2P", monospace',
+  fallback: '"Press Start 2P", monospace',
+};
 
 function px(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, color: string) {
   ctx.fillStyle = color;
