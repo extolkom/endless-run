@@ -1369,9 +1369,11 @@ function drawPlayer(
             }} />
 
             <div style={{
-              background: '#080818',
-              border: '4px solid #39ff14',
-              boxShadow: '0 0 40px #39ff1440, 6px 6px 0 #000',
+              background: 'rgba(11, 23, 50, 0.9)',
+              border: `1.5px solid ${NINJA_THEME.accentPrimary}`,
+              borderRadius: BORDER_RADIUS.container,
+              boxShadow: SHADOWS.glowMediumBlue,
+              backdropFilter: 'blur(8px)',
               padding: '28px 24px',
               textAlign: 'center',
               maxWidth: 320,
