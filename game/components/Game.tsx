@@ -1343,7 +1343,7 @@ function drawPlayer(
               {/* Title */}
               <div style={{
                 color: PAL.neon, fontSize: 20,
-                fontFamily: '"Press Start 2P", monospace',
+                fontFamily: FONT_FAMILY.display,
                 textShadow: `0 0 20px ${PAL.neon}, 2px 2px 0 #000`,
                 animation: 'glow 2s infinite',
                 marginBottom: 2, lineHeight: 1.4,
