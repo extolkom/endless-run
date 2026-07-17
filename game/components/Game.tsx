@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { submitScoreOnChain, fetchTopScores, type TopScore } from '../lib/leaderboard';
+import { BORDER_RADIUS, SHADOWS, GRADIENTS } from '../lib/styleConstants';
 
 // Ethereum window type
 declare global {
@@ -1393,9 +1394,44 @@ function drawPlayer(
                 </div>
               )}
 
-              <button onClick={() => startGame()} style={pixelBtn(PAL.neon)}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = '6px 6px 0 #000'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '4px 4px 0 #000'; }}>
+              <button
+                onClick={() => startGame()}
+                style={{
+                  background: GRADIENTS.accentBlue,
+                  color: NINJA_THEME.bg,
+                  border: '1.5px solid rgba(255, 255, 255, 0.25)',
+                  borderRadius: BORDER_RADIUS.button,
+                  boxShadow: SHADOWS.glowMediumBlue,
+                  fontFamily: '"Press Start 2P", monospace',
+                  fontSize: 11,
+                  padding: '14px 28px',
+                  cursor: 'pointer',
+                  letterSpacing: 0.5,
+                  transition: 'all 0.2s ease',
+                  display: 'inline-block',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = SHADOWS.glowStrongBlue;
+                  e.currentTarget.style.background = GRADIENTS.accentBlueReverse;
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                  e.currentTarget.style.background = GRADIENTS.accentBlue;
+                }}
+                onTouchStart={e => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = SHADOWS.glowStrongBlue;
+                  e.currentTarget.style.background = GRADIENTS.accentBlueReverse;
+                }}
+                onTouchEnd={e => {
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                  e.currentTarget.style.background = GRADIENTS.accentBlue;
+                }}>
                 ▶ START
               </button>
 
