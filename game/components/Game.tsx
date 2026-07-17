@@ -1281,22 +1281,6 @@ function drawPlayer(
 
     // ─── Styles ────────────────────────────────────────────────────────────────
 
-    const pixelBtn = (bg: string, fg = '#000', sm = false) => ({
-      background: bg,
-      color: fg,
-      border: '3px solid #000',
-      boxShadow: '4px 4px 0 #000',
-      fontFamily: '"Press Start 2P", monospace',
-      fontSize: sm ? 9 : 11,
-      padding: sm ? '10px 18px' : '13px 24px',
-      cursor: 'pointer',
-      letterSpacing: 0.5,
-      imageRendering: 'pixelated' as const,
-      transition: 'transform 0.08s, box-shadow 0.08s',
-      display: 'inline-block',
-      lineHeight: 1.4,
-      textAlign: 'center' as const,
-    });
 
     return (
       <div style={{
@@ -1412,8 +1396,35 @@ function drawPlayer(
               <div style={{
                 color: PAL.coin, fontSize: 7,
                 fontFamily: '"Press Start 2P", monospace',
-                letterSpacing: 3, marginBottom: 20,
+                letterSpacing: 3, marginBottom: 12,
               }}>× CELO EDITION ×</div>
+
+              {/* Wallet Status Badge */}
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+                background: 'rgba(11, 23, 50, 0.5)',
+                border: '1px solid rgba(57, 195, 255, 0.15)',
+                borderRadius: BORDER_RADIUS.button,
+                padding: '6px 10px',
+                marginBottom: 20,
+                fontSize: 6,
+                fontFamily: '"Press Start 2P", monospace',
+              }}>
+                <span style={{
+                  display: 'inline-block',
+                  width: 4,
+                  height: 4,
+                  borderRadius: '50%',
+                  background: walletData.isConnected ? '#39ff14' : '#ef4444',
+                  boxShadow: walletData.isConnected ? '0 0 6px #39ff14' : '0 0 6px #ef4444',
+                }} />
+                <span style={{ color: walletData.isConnected ? 'rgba(230, 245, 255, 0.8)' : 'rgba(230, 245, 255, 0.4)' }}>
+                  {walletData.isConnected ? `WALLET: ${formatAddress(walletData.address)}` : 'WALLET DISCONNECTED'}
+                </span>
+              </div>
 
               <div style={{ fontSize: 44, marginBottom: 18 }}>🐆</div>
 
@@ -1650,21 +1661,24 @@ function drawPlayer(
 
               {/* ── BUY LIVES — Subway Surfers style ── */}
               <div style={{
-                background: '#0a0018',
-                border: `3px solid ${walletData.isConnected ? PAL.purple : '#333'}`,
-                boxShadow: walletData.isConnected ? `0 0 20px ${PAL.purple}40` : 'none',
+                background: 'rgba(11, 23, 50, 0.5)',
+                border: walletData.isConnected 
+                  ? `1.5px solid ${NINJA_THEME.accentPrimary}` 
+                  : '1px solid rgba(57, 195, 255, 0.15)',
+                borderRadius: BORDER_RADIUS.button,
+                boxShadow: walletData.isConnected ? SHADOWS.glowMediumBlue : 'none',
                 padding: '14px',
                 marginBottom: 16,
                 animation: walletData.isConnected ? 'pulse 1.5s infinite' : 'none',
               }}>
                 <div style={{ fontSize: 22, marginBottom: 6 }}>❤️</div>
                 <div style={{
-                  color: walletData.isConnected ? PAL.purple : '#666',
+                  color: walletData.isConnected ? NINJA_THEME.accentPrimary : 'rgba(230, 245, 255, 0.4)',
                   fontSize: 8,
                   fontFamily: '"Press Start 2P", monospace',
                   marginBottom: 4,
                 }}>CONTINUE?</div>
-                <div style={{ color: '#888', fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginBottom: 10, lineHeight: 2 }}>
+                <div style={{ color: 'rgba(230, 245, 255, 0.4)', fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginBottom: 10, lineHeight: 2 }}>
                   GET {EXTRA_LIVES} LIVES<br />
                   <span style={{ color: PAL.coin }}>
                     COSTS {walletData.isMinipay ? `${LIVES_COST_USDM} USDm` : `${LIVES_COST_CELO} CELO`}
@@ -1672,7 +1686,7 @@ function drawPlayer(
                 </div>
                 {/* MiniPay connects implicitly — never show a connect prompt there. */}
                 {!walletData.isConnected && !walletData.isMinipay ? (
-                  <div style={{ color: '#888', fontSize: 5, fontFamily: '"Press Start 2P", monospace' }}>
+                  <div style={{ color: 'rgba(230, 245, 255, 0.35)', fontSize: 6, fontFamily: '"Press Start 2P", monospace' }}>
                     CONNECT WALLET TO CONTINUE
                   </div>
                 ) : (
@@ -1680,14 +1694,51 @@ function drawPlayer(
                     onClick={buyLives}
                     disabled={isProcessingBuy}
                     style={{
-                      ...pixelBtn(PAL.purple, '#fff', true),
-                      width: '100%',
-                      animation: 'none',
-                      opacity: isProcessingBuy ? 0.6 : 1,
+                      background: GRADIENTS.accentBlue,
+                      color: NINJA_THEME.bg,
+                      border: '1.5px solid rgba(255, 255, 255, 0.25)',
+                      borderRadius: BORDER_RADIUS.button,
+                      boxShadow: SHADOWS.glowMediumBlue,
+                      fontFamily: '"Press Start 2P", monospace',
+                      fontSize: 9,
+                      padding: '10px 18px',
                       cursor: isProcessingBuy ? 'not-allowed' : 'pointer',
+                      letterSpacing: 0.5,
+                      transition: 'all 0.2s ease',
+                      display: 'block',
+                      width: '100%',
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                      opacity: isProcessingBuy ? 0.6 : 1,
                     }}
-                    onMouseEnter={e => { if (!isProcessingBuy) { e.currentTarget.style.transform = 'translate(-2px,-2px)'; } }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = ''; }}
+                    onMouseEnter={e => {
+                      if (!isProcessingBuy) {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = SHADOWS.glowStrongBlue;
+                        e.currentTarget.style.background = GRADIENTS.accentBlueReverse;
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      if (!isProcessingBuy) {
+                        e.currentTarget.style.transform = 'none';
+                        e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                        e.currentTarget.style.background = GRADIENTS.accentBlue;
+                      }
+                    }}
+                    onTouchStart={e => {
+                      if (!isProcessingBuy) {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = SHADOWS.glowStrongBlue;
+                        e.currentTarget.style.background = GRADIENTS.accentBlueReverse;
+                      }
+                    }}
+                    onTouchEnd={e => {
+                      if (!isProcessingBuy) {
+                        e.currentTarget.style.transform = 'none';
+                        e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                        e.currentTarget.style.background = GRADIENTS.accentBlue;
+                      }
+                    }}
                   >
                     {isProcessingBuy ? '⏳ PROCESSING...' : '💎 BUY LIVES'}
                   </button>
