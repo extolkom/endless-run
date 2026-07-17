@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { submitScoreOnChain, fetchTopScores, type TopScore } from '../lib/leaderboard';
-import { BORDER_RADIUS, SHADOWS, GRADIENTS } from '../lib/styleConstants';
+import { BORDER_RADIUS, SHADOWS, GRADIENTS, SPACING } from '../lib/styleConstants';
 
 // Ethereum window type
 declare global {
@@ -1317,6 +1317,7 @@ function drawPlayer(
         @keyframes pop     { 0%{transform:scale(0.5)} 60%{transform:scale(1.15)} 100%{transform:scale(1)} }
         @keyframes glow    { 0%,100%{text-shadow:0 0 8px #39c3ff} 50%{text-shadow:0 0 24px #39c3ff, 0 0 40px #39c3ff} }
         @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:0.6} }
+        @keyframes spin    { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         button:active { transform: translate(3px,3px) !important; box-shadow: 1px 1px 0 #000 !important; }
         canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
       `}</style>
@@ -1341,6 +1342,23 @@ function drawPlayer(
               maxWidth: 320,
               width: '92%',
             }}>
+              {/* Logo / Icon Accent */}
+              <svg
+                viewBox="0 0 100 100"
+                width="32"
+                height="32"
+                fillRule="evenodd"
+                style={{
+                  fill: NINJA_THEME.accentPrimary,
+                  filter: `drop-shadow(0 0 8px ${NINJA_THEME.accentPrimary}88)`,
+                  display: 'block',
+                  margin: `0 auto ${SPACING.sm}`,
+                  animation: 'spin 12s linear infinite',
+                }}
+              >
+                <path d="M 50 10 C 50 35 65 35 90 50 C 65 50 65 65 50 90 C 50 65 35 65 10 50 C 35 50 35 35 50 10 Z M 50 42 A 8 8 0 1 0 50 58 A 8 8 0 1 0 50 42 Z" />
+              </svg>
+
               {/* Title */}
               <div style={{
                 background: `linear-gradient(135deg, ${NINJA_THEME.accentPrimary}, ${NINJA_THEME.accentSecondary})`,
