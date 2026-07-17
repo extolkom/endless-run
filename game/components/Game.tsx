@@ -1314,7 +1314,7 @@ function drawPlayer(
         @keyframes blink   { 0%,100%{opacity:1} 50%{opacity:0.2} }
         @keyframes shake   { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 60%{transform:translateX(8px)} }
         @keyframes pop     { 0%{transform:scale(0.5)} 60%{transform:scale(1.15)} 100%{transform:scale(1)} }
-        @keyframes glow    { 0%,100%{text-shadow:0 0 8px #39ff14} 50%{text-shadow:0 0 24px #39ff14, 0 0 40px #39ff14} }
+        @keyframes glow    { 0%,100%{text-shadow:0 0 8px #39c3ff} 50%{text-shadow:0 0 24px #39c3ff, 0 0 40px #39c3ff} }
         @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:0.6} }
         button:active { transform: translate(3px,3px) !important; box-shadow: 1px 1px 0 #000 !important; }
         canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
@@ -1342,12 +1342,15 @@ function drawPlayer(
             }}>
               {/* Title */}
               <div style={{
-                color: PAL.neon, fontSize: 20,
+                background: `linear-gradient(135deg, ${NINJA_THEME.accentPrimary}, ${NINJA_THEME.accentSecondary})`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontSize: 20,
                 fontFamily: FONT_FAMILY.display,
-                textShadow: `0 0 20px ${PAL.neon}, 2px 2px 0 #000`,
+                textShadow: `0 0 20px rgba(57, 195, 255, 0.4)`,
                 animation: 'glow 2s infinite',
                 marginBottom: 2, lineHeight: 1.4,
-              }}>ENDLES RUN</div>
+              }}>ENDLESS RUN</div>
               <div style={{
                 color: PAL.coin, fontSize: 7,
                 fontFamily: '"Press Start 2P", monospace',
