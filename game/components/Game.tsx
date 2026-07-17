@@ -1380,16 +1380,20 @@ function drawPlayer(
 
               {/* Controls */}
               <div style={{
-                background: '#000', border: '2px solid #222',
-                padding: '10px 12px', marginBottom: 16, textAlign: 'left',
+                background: 'rgba(11, 23, 50, 0.5)',
+                border: '1px solid rgba(57, 195, 255, 0.25)',
+                borderRadius: BORDER_RADIUS.button,
+                padding: `${SPACING.sm} ${SPACING.md}`,
+                marginBottom: SPACING.md,
+                textAlign: 'left',
               }}>
                 {[
                   ['TAP / SPACE', 'JUMP'],
                   ['TAP AGAIN', 'DOUBLE JUMP'],
                 ].map(([k, v]) => (
-                  <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 6 }}>
-                    <span style={{ color: PAL.amber, fontSize: 7, fontFamily: '"Press Start 2P", monospace' }}>{k}</span>
-                    <span style={{ color: '#888', fontSize: 7, fontFamily: '"Press Start 2P", monospace' }}>{v}</span>
+                  <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: SPACING.xs }}>
+                    <span style={{ color: 'rgba(230, 245, 255, 0.8)', fontSize: 7, fontFamily: '"Press Start 2P", monospace' }}>{k}</span>
+                    <span style={{ color: 'rgba(230, 245, 255, 0.4)', fontSize: 7, fontFamily: '"Press Start 2P", monospace' }}>{v}</span>
                   </div>
                 ))}
               </div>
@@ -1498,7 +1502,7 @@ function drawPlayer(
                 </button>
               </div>
 
-              <div style={{ color: '#333', fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginTop: 14 }}>
+              <div style={{ color: 'rgba(230, 245, 255, 0.35)', fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginTop: SPACING.md }}>
                 PRESS ENTER TO START
               </div>
             </div>
