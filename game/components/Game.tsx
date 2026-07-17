@@ -1394,46 +1394,91 @@ function drawPlayer(
                 </div>
               )}
 
-              <button
-                onClick={() => startGame()}
-                style={{
-                  background: GRADIENTS.accentBlue,
-                  color: NINJA_THEME.bg,
-                  border: '1.5px solid rgba(255, 255, 255, 0.25)',
-                  borderRadius: BORDER_RADIUS.button,
-                  boxShadow: SHADOWS.glowMediumBlue,
-                  fontFamily: '"Press Start 2P", monospace',
-                  fontSize: 11,
-                  padding: '14px 28px',
-                  cursor: 'pointer',
-                  letterSpacing: 0.5,
-                  transition: 'all 0.2s ease',
-                  display: 'inline-block',
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = SHADOWS.glowStrongBlue;
-                  e.currentTarget.style.background = GRADIENTS.accentBlueReverse;
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.transform = 'none';
-                  e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
-                  e.currentTarget.style.background = GRADIENTS.accentBlue;
-                }}
-                onTouchStart={e => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = SHADOWS.glowStrongBlue;
-                  e.currentTarget.style.background = GRADIENTS.accentBlueReverse;
-                }}
-                onTouchEnd={e => {
-                  e.currentTarget.style.transform = 'none';
-                  e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
-                  e.currentTarget.style.background = GRADIENTS.accentBlue;
-                }}>
-                ▶ START
-              </button>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 4 }}>
+                <button
+                  onClick={() => startGame()}
+                  style={{
+                    background: GRADIENTS.accentBlue,
+                    color: NINJA_THEME.bg,
+                    border: '1.5px solid rgba(255, 255, 255, 0.25)',
+                    borderRadius: BORDER_RADIUS.button,
+                    boxShadow: SHADOWS.glowMediumBlue,
+                    fontFamily: '"Press Start 2P", monospace',
+                    fontSize: 11,
+                    padding: '14px 28px',
+                    cursor: 'pointer',
+                    letterSpacing: 0.5,
+                    transition: 'all 0.2s ease',
+                    display: 'block',
+                    width: '100%',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = SHADOWS.glowStrongBlue;
+                    e.currentTarget.style.background = GRADIENTS.accentBlueReverse;
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                    e.currentTarget.style.background = GRADIENTS.accentBlue;
+                  }}
+                  onTouchStart={e => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = SHADOWS.glowStrongBlue;
+                    e.currentTarget.style.background = GRADIENTS.accentBlueReverse;
+                  }}
+                  onTouchEnd={e => {
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                    e.currentTarget.style.background = GRADIENTS.accentBlue;
+                  }}>
+                  ▶ START
+                </button>
+
+                <button
+                  onClick={openLeaderboard}
+                  style={{
+                    background: 'transparent',
+                    color: NINJA_THEME.accentPrimary,
+                    border: `1.5px solid ${NINJA_THEME.accentPrimary}`,
+                    borderRadius: BORDER_RADIUS.button,
+                    boxShadow: 'none',
+                    fontFamily: '"Press Start 2P", monospace',
+                    fontSize: 10,
+                    padding: '12px 24px',
+                    cursor: 'pointer',
+                    letterSpacing: 0.5,
+                    transition: 'all 0.2s ease',
+                    display: 'block',
+                    width: '100%',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                    e.currentTarget.style.background = 'rgba(57, 195, 255, 0.15)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                  onTouchStart={e => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                    e.currentTarget.style.background = 'rgba(57, 195, 255, 0.15)';
+                  }}
+                  onTouchEnd={e => {
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.background = 'transparent';
+                  }}>
+                  🏆 LEADERBOARD
+                </button>
+              </div>
 
               <div style={{ color: '#333', fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginTop: 14 }}>
                 PRESS ENTER TO START
@@ -1591,26 +1636,128 @@ function drawPlayer(
               <button
                 onClick={openLeaderboard}
                 style={{
-                  ...pixelBtn('#FFD700', '#000', true),
+                  background: 'transparent',
+                  color: NINJA_THEME.accentPrimary,
+                  border: `1.5px solid ${NINJA_THEME.accentPrimary}`,
+                  borderRadius: BORDER_RADIUS.button,
+                  boxShadow: 'none',
+                  fontFamily: '"Press Start 2P", monospace',
+                  fontSize: 10,
+                  padding: '12px 24px',
+                  cursor: 'pointer',
+                  letterSpacing: 0.5,
+                  transition: 'all 0.2s ease',
+                  display: 'inline-block',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
                   width: '100%',
                   marginBottom: 12,
-                  boxShadow: '0 0 18px #FFD70055, 4px 4px 0 #000',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = ''; }}>
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                  e.currentTarget.style.background = 'rgba(57, 195, 255, 0.15)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.background = 'transparent';
+                }}
+                onTouchStart={e => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                  e.currentTarget.style.background = 'rgba(57, 195, 255, 0.15)';
+                }}
+                onTouchEnd={e => {
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.background = 'transparent';
+                }}>
                 🏆 LEADERBOARD
               </button>
 
               {/* Buttons */}
               <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-                <button onClick={() => startGame()} style={pixelBtn(PAL.neon)}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = ''; }}>
+                <button
+                  onClick={() => startGame()}
+                  style={{
+                    background: GRADIENTS.accentBlue,
+                    color: NINJA_THEME.bg,
+                    border: '1.5px solid rgba(255, 255, 255, 0.25)',
+                    borderRadius: BORDER_RADIUS.button,
+                    boxShadow: SHADOWS.glowMediumBlue,
+                    fontFamily: '"Press Start 2P", monospace',
+                    fontSize: 11,
+                    padding: '12px 24px',
+                    cursor: 'pointer',
+                    letterSpacing: 0.5,
+                    transition: 'all 0.2s ease',
+                    display: 'inline-block',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                    flex: 1,
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = SHADOWS.glowStrongBlue;
+                    e.currentTarget.style.background = GRADIENTS.accentBlueReverse;
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                    e.currentTarget.style.background = GRADIENTS.accentBlue;
+                  }}
+                  onTouchStart={e => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = SHADOWS.glowStrongBlue;
+                    e.currentTarget.style.background = GRADIENTS.accentBlueReverse;
+                  }}
+                  onTouchEnd={e => {
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                    e.currentTarget.style.background = GRADIENTS.accentBlue;
+                  }}>
                   ▶ RETRY
                 </button>
-                <button onClick={() => { setShowLeaderboard(false); setGamePhase('idle'); }} style={pixelBtn('#222', '#fff')}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = ''; }}>
+                <button
+                  onClick={() => { setShowLeaderboard(false); setGamePhase('idle'); }}
+                  style={{
+                    background: 'transparent',
+                    color: NINJA_THEME.accentPrimary,
+                    border: `1.5px solid ${NINJA_THEME.accentPrimary}`,
+                    borderRadius: BORDER_RADIUS.button,
+                    boxShadow: 'none',
+                    fontFamily: '"Press Start 2P", monospace',
+                    fontSize: 11,
+                    padding: '12px 24px',
+                    cursor: 'pointer',
+                    letterSpacing: 0.5,
+                    transition: 'all 0.2s ease',
+                    display: 'inline-block',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                    flex: 1,
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                    e.currentTarget.style.background = 'rgba(57, 195, 255, 0.15)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                  onTouchStart={e => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                    e.currentTarget.style.background = 'rgba(57, 195, 255, 0.15)';
+                  }}
+                  onTouchEnd={e => {
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.background = 'transparent';
+                  }}>
                   MENU
                 </button>
               </div>
@@ -1642,9 +1789,23 @@ function drawPlayer(
                 <button
                   onClick={() => setShowLeaderboard(false)}
                   style={{
-                    ...pixelBtn('#222', '#fff', true),
-                    padding: '8px 10px',
+                    background: 'transparent',
+                    color: NINJA_THEME.accentPrimary,
+                    border: `1px solid ${NINJA_THEME.accentPrimary}`,
+                    borderRadius: BORDER_RADIUS.button,
+                    fontFamily: '"Press Start 2P", monospace',
+                    padding: '6px 10px',
                     fontSize: 8,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.transform = 'scale(1.1)';
+                    e.currentTarget.style.background = 'rgba(57, 195, 255, 0.15)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.background = 'transparent';
                   }}
                 >✕</button>
               </div>
@@ -1702,11 +1863,45 @@ function drawPlayer(
               <button
                 onClick={() => setShowLeaderboard(false)}
                 style={{
-                  ...pixelBtn(PAL.neon, '#000', true),
+                  background: 'transparent',
+                  color: NINJA_THEME.accentPrimary,
+                  border: `1.5px solid ${NINJA_THEME.accentPrimary}`,
+                  borderRadius: BORDER_RADIUS.button,
+                  boxShadow: 'none',
+                  fontFamily: '"Press Start 2P", monospace',
+                  fontSize: 10,
+                  padding: '12px 24px',
+                  cursor: 'pointer',
+                  letterSpacing: 0.5,
+                  transition: 'all 0.2s ease',
+                  display: 'inline-block',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
                   width: '100%',
                   marginTop: 14,
                 }}
-              >BACK</button>
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                  e.currentTarget.style.background = 'rgba(57, 195, 255, 0.15)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.background = 'transparent';
+                }}
+                onTouchStart={e => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                  e.currentTarget.style.background = 'rgba(57, 195, 255, 0.15)';
+                }}
+                onTouchEnd={e => {
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.background = 'transparent';
+                }}>
+                BACK
+              </button>
             </div>
           </div>
         )}
