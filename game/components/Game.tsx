@@ -1328,7 +1328,7 @@ function drawPlayer(
           <div style={{
             position: 'absolute', inset: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'rgba(0,0,0,0.85)',
+            background: `linear-gradient(135deg, ${NINJA_THEME.bg}, ${NINJA_THEME.bgSecondary})`,
             animation: 'fadeIn 0.3s ease',
           }}>
             <div style={{
