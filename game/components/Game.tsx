@@ -1318,6 +1318,16 @@ function drawPlayer(
         @keyframes glow    { 0%,100%{text-shadow:0 0 8px #39c3ff} 50%{text-shadow:0 0 24px #39c3ff, 0 0 40px #39c3ff} }
         @keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:0.6} }
         @keyframes spin    { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes floatBlob1 {
+          0% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(15%, 10%) scale(1.1); }
+          100% { transform: translate(-5%, 15%) scale(0.9); }
+        }
+        @keyframes floatBlob2 {
+          0% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(-10%, -15%) scale(0.95); }
+          100% { transform: translate(10%, -5%) scale(1.05); }
+        }
         button:active { transform: translate(3px,3px) !important; box-shadow: 1px 1px 0 #000 !important; }
         canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
       `}</style>
@@ -1332,7 +1342,32 @@ function drawPlayer(
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             background: `linear-gradient(135deg, ${NINJA_THEME.bg}, ${NINJA_THEME.bgSecondary})`,
             animation: 'fadeIn 0.3s ease',
+            overflow: 'hidden',
           }}>
+            {/* Ambient Background Blobs */}
+            <div style={{
+              position: 'absolute',
+              top: '-15%', left: '-15%',
+              width: '60%', height: '60%',
+              background: `radial-gradient(circle, ${NINJA_THEME.accentPrimary}1A 0%, transparent 70%)`,
+              borderRadius: '50%',
+              filter: 'blur(50px)',
+              pointerEvents: 'none',
+              animation: 'floatBlob1 20s ease-in-out infinite alternate',
+              zIndex: 1,
+            }} />
+            <div style={{
+              position: 'absolute',
+              bottom: '-15%', right: '-15%',
+              width: '60%', height: '60%',
+              background: `radial-gradient(circle, ${NINJA_THEME.accentSecondary}1A 0%, transparent 70%)`,
+              borderRadius: '50%',
+              filter: 'blur(50px)',
+              pointerEvents: 'none',
+              animation: 'floatBlob2 25s ease-in-out infinite alternate',
+              zIndex: 1,
+            }} />
+
             <div style={{
               background: '#080818',
               border: '4px solid #39ff14',
@@ -1341,6 +1376,8 @@ function drawPlayer(
               textAlign: 'center',
               maxWidth: 320,
               width: '92%',
+              position: 'relative',
+              zIndex: 5,
             }}>
               {/* Logo / Icon Accent */}
               <svg
