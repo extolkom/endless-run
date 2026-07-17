@@ -35,6 +35,31 @@ export type ScoreSubmissionResult =
   | { status: 'no-gas' }
   | { status: 'error' };
 
+// ─── Temporary debug error logging helper ───
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function reportDebugError(context: string, err: any) {
+  try {
+    const errorDetails = {
+      context,
+      message: err?.message || String(err),
+      code: err?.code,
+      action: err?.action,
+      reason: err?.reason,
+      transaction: err?.transaction,
+      receipt: err?.receipt,
+      info: err?.info,
+      stack: err?.stack,
+    };
+    await fetch('/api/debug-log', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(errorDetails),
+    });
+  } catch (e) {
+    console.error('Failed to send debug log:', e);
+  }
+}
+
 /**
  * Record a finished run on-chain. Sends a real Celo transaction via the
  * connected wallet (MiniPay / MetaMask). Returns a structured result so the UI
@@ -88,10 +113,14 @@ export async function submitScoreOnChain(score: number): Promise<ScoreSubmission
       });
       try {
         const receipt = await provider.waitForTransaction(hash, 1);
-        if (!receipt || receipt.status !== 1) return { status: 'error' };
+        if (!receipt || receipt.status !== 1) {
+          await reportDebugError('MiniPay waitForTransaction receipt status !== 1', receipt);
+          return { status: 'error' };
+        }
         return { status: 'saved', txHash: hash };
       } catch (waitError) {
         console.error('[leaderboard] MiniPay waitForTransaction error', waitError);
+        await reportDebugError('MiniPay waitForTransaction catch', waitError);
         return { status: 'error' };
       }
     }
@@ -105,6 +134,7 @@ export async function submitScoreOnChain(score: number): Promise<ScoreSubmission
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error('[leaderboard] submitScoreOnChain catch-all', error);
+    await reportDebugError('submitScoreOnChain catch-all', error);
     if (message.includes('user rejected') || message.includes('declined')) {
       return { status: 'declined' };
     }
