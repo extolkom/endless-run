@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
-
 @font-face {
   font-family: 'Vampire Wars';
   src: url('/fonts/VampireWars.otf') format('opentype');
@@ -12,17 +10,4 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
-
-:root {
-  --font-display: 'Vampire Wars', 'Press Start 2P', monospace;
-  --font-display-fallback: 'Press Start 2P', monospace;
-  --green-deep: #050;
-  --ninja-bg: #040a1a;
-  --ninja-bg-secondary: #0b1732;
-  --ninja-accent-primary: #39c3ff;
-  --ninja-accent-secondary: #60a8ff;
-  --ninja-text: #e6f5ff;
-  --ninja-success: #50d892;
-  --ninja-error: #ff5a6d;
 }

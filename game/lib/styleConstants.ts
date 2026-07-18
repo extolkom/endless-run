@@ -56,23 +56,4 @@ export const GRADIENTS = {
   bgSubtle: 'linear-gradient(135deg, #040a1a, #0b1732)',
 } as const;
 
-// Card/panel style presets (combining shadow + radius + padding)
-export const CARD_STYLES = {
-  elevated: {
-    borderRadius: BORDER_RADIUS.card,
-    boxShadow: SHADOWS.glowSoftBlue,
-    padding: SPACING.lg,
-    background: 'rgba(11, 23, 50, 0.8)',  // slightly transparent ninja-bg-secondary
-    backdropFilter: 'blur(8px)',           // frosted glass effect
-  },
 
-  elevated_interactive: {
-    borderRadius: BORDER_RADIUS.card,
-    boxShadow: SHADOWS.glowMediumBlue,
-    padding: SPACING.lg,
-    background: 'rgba(11, 23, 50, 0.9)',
-    backdropFilter: 'blur(8px)',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
-  },
-} as const;
