@@ -1314,6 +1314,109 @@ function drawPlayer(
         }
         button:active { transform: translate(3px,3px) !important; box-shadow: 1px 1px 0 #000 !important; }
         canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+
+        .start-card-container {
+          background: rgba(11, 23, 50, 0.9);
+          border: 1.5px solid ${NINJA_THEME.accentPrimary};
+          border-radius: ${BORDER_RADIUS.container};
+          box-shadow: ${SHADOWS.glowMediumBlue};
+          backdrop-filter: blur(8px);
+          padding: 28px 24px;
+          text-align: center;
+          max-width: 320px;
+          width: 92%;
+          position: relative;
+          z-index: 5;
+          transition: all 0.2s ease;
+        }
+        .start-card-title {
+          background: linear-gradient(135deg, ${NINJA_THEME.accentPrimary}, ${NINJA_THEME.accentSecondary});
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          font-size: 20px;
+          font-family: ${FONT_FAMILY.display};
+          text-shadow: 0 0 20px rgba(57, 195, 255, 0.4);
+          animation: glow 2s infinite;
+          margin-bottom: 2px;
+          line-height: 1.4;
+        }
+        .start-card-btn-start {
+          background: ${GRADIENTS.accentBlue};
+          color: ${NINJA_THEME.bg};
+          border: 1.5px solid rgba(255, 255, 255, 0.25);
+          border-radius: ${BORDER_RADIUS.button};
+          box-shadow: ${SHADOWS.glowMediumBlue};
+          font-family: "Press Start 2P", monospace;
+          font-size: 11px;
+          padding: 14px 28px;
+          cursor: pointer;
+          letter-spacing: 0.5px;
+          transition: all 0.2s ease;
+          display: block;
+          width: 100%;
+          font-weight: bold;
+          text-align: center;
+          min-height: 46px;
+        }
+        .start-card-btn-leaderboard {
+          background: transparent;
+          color: ${NINJA_THEME.accentPrimary};
+          border: 1.5px solid ${NINJA_THEME.accentPrimary};
+          border-radius: ${BORDER_RADIUS.button};
+          box-shadow: none;
+          font-family: "Press Start 2P", monospace;
+          font-size: 10px;
+          padding: 12px 24px;
+          cursor: pointer;
+          letter-spacing: 0.5px;
+          transition: all 0.2s ease;
+          display: block;
+          width: 100%;
+          font-weight: bold;
+          text-align: center;
+          min-height: 44px;
+        }
+        @media (hover: hover) {
+          .start-card-btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: ${SHADOWS.glowStrongBlue};
+            background: ${GRADIENTS.accentBlueReverse};
+          }
+          .start-card-btn-leaderboard:hover {
+            transform: translateY(-2px);
+            box-shadow: ${SHADOWS.glowMediumBlue};
+            background: rgba(57, 195, 255, 0.15);
+          }
+        }
+        /* Mobile tap/active feedback to replace onTouchStart/onTouchEnd */
+        .start-card-btn-start:active {
+          transform: translateY(1px) !important;
+          box-shadow: 0 0 12px rgba(57, 195, 255, 0.2) !important;
+          background: ${GRADIENTS.accentBlueReverse} !important;
+        }
+        .start-card-btn-leaderboard:active {
+          transform: translateY(1px) !important;
+          box-shadow: 0 0 12px rgba(57, 195, 255, 0.2) !important;
+          background: rgba(57, 195, 255, 0.15) !important;
+        }
+        @media (max-width: 480px) {
+          .start-card-container {
+            padding: clamp(16px, 5vh, 24px) clamp(12px, 4vw, 20px);
+          }
+          .start-card-title {
+            font-size: clamp(15px, 5.2vw, 18px);
+          }
+          .start-card-btn-start {
+            padding: 15px 20px;
+            font-size: 10px;
+            min-height: 44px;
+          }
+          .start-card-btn-leaderboard {
+            padding: 14px 20px;
+            font-size: 9px;
+            min-height: 44px;
+          }
+        }
       `}</style>
 
         {/* Canvas — full viewport */}
@@ -1352,19 +1455,7 @@ function drawPlayer(
               zIndex: 1,
             }} />
 
-            <div style={{
-              background: 'rgba(11, 23, 50, 0.9)',
-              border: `1.5px solid ${NINJA_THEME.accentPrimary}`,
-              borderRadius: BORDER_RADIUS.container,
-              boxShadow: SHADOWS.glowMediumBlue,
-              backdropFilter: 'blur(8px)',
-              padding: '28px 24px',
-              textAlign: 'center',
-              maxWidth: 320,
-              width: '92%',
-              position: 'relative',
-              zIndex: 5,
-            }}>
+            <div className="start-card-container">
               {/* Logo / Icon Accent */}
               <svg
                 viewBox="0 0 100 100"
@@ -1383,16 +1474,7 @@ function drawPlayer(
               </svg>
 
               {/* Title */}
-              <div style={{
-                background: `linear-gradient(135deg, ${NINJA_THEME.accentPrimary}, ${NINJA_THEME.accentSecondary})`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                fontSize: 20,
-                fontFamily: FONT_FAMILY.display,
-                textShadow: `0 0 20px rgba(57, 195, 255, 0.4)`,
-                animation: 'glow 2s infinite',
-                marginBottom: 2, lineHeight: 1.4,
-              }}>ENDLESS RUN</div>
+              <div className="start-card-title">ENDLESS RUN</div>
               <div style={{
                 color: PAL.coin, fontSize: 7,
                 fontFamily: '"Press Start 2P", monospace',
@@ -1469,85 +1551,15 @@ function drawPlayer(
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 4 }}>
                 <button
                   onClick={() => startGame()}
-                  style={{
-                    background: GRADIENTS.accentBlue,
-                    color: NINJA_THEME.bg,
-                    border: '1.5px solid rgba(255, 255, 255, 0.25)',
-                    borderRadius: BORDER_RADIUS.button,
-                    boxShadow: SHADOWS.glowMediumBlue,
-                    fontFamily: '"Press Start 2P", monospace',
-                    fontSize: 11,
-                    padding: '14px 28px',
-                    cursor: 'pointer',
-                    letterSpacing: 0.5,
-                    transition: 'all 0.2s ease',
-                    display: 'block',
-                    width: '100%',
-                    fontWeight: 'bold',
-                    textAlign: 'center',
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = SHADOWS.glowStrongBlue;
-                    e.currentTarget.style.background = GRADIENTS.accentBlueReverse;
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.transform = 'none';
-                    e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
-                    e.currentTarget.style.background = GRADIENTS.accentBlue;
-                  }}
-                  onTouchStart={e => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = SHADOWS.glowStrongBlue;
-                    e.currentTarget.style.background = GRADIENTS.accentBlueReverse;
-                  }}
-                  onTouchEnd={e => {
-                    e.currentTarget.style.transform = 'none';
-                    e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
-                    e.currentTarget.style.background = GRADIENTS.accentBlue;
-                  }}>
+                  className="start-card-btn-start"
+                >
                   ▶ START
                 </button>
 
                 <button
                   onClick={openLeaderboard}
-                  style={{
-                    background: 'transparent',
-                    color: NINJA_THEME.accentPrimary,
-                    border: `1.5px solid ${NINJA_THEME.accentPrimary}`,
-                    borderRadius: BORDER_RADIUS.button,
-                    boxShadow: 'none',
-                    fontFamily: '"Press Start 2P", monospace',
-                    fontSize: 10,
-                    padding: '12px 24px',
-                    cursor: 'pointer',
-                    letterSpacing: 0.5,
-                    transition: 'all 0.2s ease',
-                    display: 'block',
-                    width: '100%',
-                    fontWeight: 'bold',
-                    textAlign: 'center',
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
-                    e.currentTarget.style.background = 'rgba(57, 195, 255, 0.15)';
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.transform = 'none';
-                    e.currentTarget.style.boxShadow = 'none';
-                    e.currentTarget.style.background = 'transparent';
-                  }}
-                  onTouchStart={e => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
-                    e.currentTarget.style.background = 'rgba(57, 195, 255, 0.15)';
-                  }}
-                  onTouchEnd={e => {
-                    e.currentTarget.style.transform = 'none';
-                    e.currentTarget.style.boxShadow = 'none';
-                    e.currentTarget.style.background = 'transparent';
-                  }}>
+                  className="start-card-btn-leaderboard"
+                >
                   🏆 LEADERBOARD
                 </button>
               </div>
