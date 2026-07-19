@@ -1612,7 +1612,7 @@ function drawPlayer(
                 lineHeight: 1.4,
                 letterSpacing: 1,
               }}>GAME OVER</div>
-              <div style={{ color: '#555', fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginBottom: 20, letterSpacing: 2 }}>
+              <div style={{ color: 'rgba(230, 245, 255, 0.4)', fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginBottom: SPACING.md, letterSpacing: 2 }}>
                 THE CHEETAH HAS FALLEN
               </div>
 
