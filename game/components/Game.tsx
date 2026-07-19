@@ -1681,12 +1681,17 @@ function drawPlayer(
               {/* On-chain leaderboard status */}
               {onChainStatus !== 'idle' && (
                 <div style={{
-                  background: '#000814', border: `2px solid ${onChainStatus === 'saved' ? PAL.cyan : PAL.red}`,
-                  padding: '8px 10px', marginBottom: 16,
+                  background: 'rgba(11, 23, 50, 0.6)',
+                  border: `1.5px solid ${onChainStatus === 'saved' ? NINJA_THEME.success : NINJA_THEME.error}`,
+                  borderRadius: BORDER_RADIUS.button,
+                  boxShadow: onChainStatus === 'saved' ? SHADOWS.glowMediumSuccess : SHADOWS.glowStrongError,
+                  padding: '8px 12px',
+                  marginBottom: 16,
                 }}>
                   <div style={{
-                    color: onChainStatus === 'saved' ? PAL.cyan : PAL.red,
+                    color: onChainStatus === 'saved' ? NINJA_THEME.success : NINJA_THEME.error,
                     fontSize: 6, fontFamily: '"Press Start 2P", monospace', lineHeight: 1.8,
+                    letterSpacing: 0.5,
                   }}>
                     {onChainStatus === 'saving' && '⛓ SAVING RUN ON-CHAIN...'}
                     {onChainStatus === 'saved' && '⛓ SAVED ON CELO ✓'}
@@ -1698,7 +1703,7 @@ function drawPlayer(
                     <a
                       href={`https://celoscan.io/tx/${onChainTx}`}
                       target="_blank" rel="noopener noreferrer"
-                      style={{ color: '#6699ff', fontSize: 5, fontFamily: '"Press Start 2P", monospace' }}
+                      style={{ color: NINJA_THEME.accentPrimary, fontSize: 6, fontFamily: '"Press Start 2P", monospace', textDecoration: 'none', display: 'inline-block', marginTop: 4 }}
                     >
                       VIEW ON CELOSCAN ↗
                     </a>
