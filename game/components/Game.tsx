@@ -1606,11 +1606,16 @@ function drawPlayer(
 
                 {/* Best Score Card */}
                 <div style={{
-                  background: '#000', border: `2px solid ${PAL.amber}`,
-                  padding: '8px 12px', flex: 1,
+                  background: 'rgba(11, 23, 50, 0.6)',
+                  border: `1.5px solid ${PAL.amber}`,
+                  borderRadius: BORDER_RADIUS.card,
+                  boxShadow: '0 0 16px rgba(245, 158, 11, 0.15)',
+                  padding: '10px 12px',
+                  flex: 1,
+                  textAlign: 'center',
                 }}>
-                  <div style={{ color: PAL.amber, fontSize: 5, fontFamily: '"Press Start 2P", monospace', marginBottom: 5 }}>BEST</div>
-                  <div style={{ color: '#fff', fontSize: 13, fontFamily: '"Press Start 2P", monospace', textShadow: `0 0 8px ${PAL.amber}` }}>{String(uiHighScore).padStart(6, '0')}</div>
+                  <div style={{ color: PAL.amber, fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginBottom: 6, letterSpacing: 0.5 }}>BEST</div>
+                  <div style={{ color: NINJA_THEME.text, fontSize: 13, fontFamily: '"Press Start 2P", monospace', textShadow: `0 0 10px ${PAL.amber}` }}>{String(uiHighScore).padStart(6, '0')}</div>
                 </div>
               </div>
 
