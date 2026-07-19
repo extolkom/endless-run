@@ -1579,18 +1579,28 @@ function drawPlayer(
 
               {/* Scores */}
               <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginBottom: 14 }}>
-                {[
-                  { label: 'SCORE', val: String(uiScore).padStart(6, '0'), color: PAL.neon },
-                  { label: 'BEST', val: String(uiHighScore).padStart(6, '0'), color: PAL.amber },
-                ].map(({ label, val, color }) => (
-                  <div key={label} style={{
-                    background: '#000', border: `2px solid ${color}`,
-                    padding: '8px 12px', flex: 1,
-                  }}>
-                    <div style={{ color, fontSize: 5, fontFamily: '"Press Start 2P", monospace', marginBottom: 5 }}>{label}</div>
-                    <div style={{ color: '#fff', fontSize: 13, fontFamily: '"Press Start 2P", monospace', textShadow: `0 0 8px ${color}` }}>{val}</div>
-                  </div>
-                ))}
+                {/* Score Card */}
+                <div style={{
+                  background: 'rgba(11, 23, 50, 0.6)',
+                  border: `1.5px solid ${NINJA_THEME.accentPrimary}`,
+                  borderRadius: BORDER_RADIUS.card,
+                  boxShadow: SHADOWS.glowSoftBlue,
+                  padding: '10px 12px',
+                  flex: 1,
+                  textAlign: 'center',
+                }}>
+                  <div style={{ color: NINJA_THEME.accentPrimary, fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginBottom: 6, letterSpacing: 0.5 }}>SCORE</div>
+                  <div style={{ color: NINJA_THEME.text, fontSize: 13, fontFamily: '"Press Start 2P", monospace', textShadow: `0 0 10px ${NINJA_THEME.accentPrimary}` }}>{String(uiScore).padStart(6, '0')}</div>
+                </div>
+
+                {/* Best Score Card */}
+                <div style={{
+                  background: '#000', border: `2px solid ${PAL.amber}`,
+                  padding: '8px 12px', flex: 1,
+                }}>
+                  <div style={{ color: PAL.amber, fontSize: 5, fontFamily: '"Press Start 2P", monospace', marginBottom: 5 }}>BEST</div>
+                  <div style={{ color: '#fff', fontSize: 13, fontFamily: '"Press Start 2P", monospace', textShadow: `0 0 8px ${PAL.amber}` }}>{String(uiHighScore).padStart(6, '0')}</div>
+                </div>
               </div>
 
               {/* CELO earned */}
