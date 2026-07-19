@@ -1563,6 +1563,29 @@ function drawPlayer(
             animation: 'fadeIn 0.35s ease',
             overflow: 'hidden',
           }}>
+            {/* Ambient Background Blobs */}
+            <div style={{
+              position: 'absolute',
+              top: '-15%', left: '-15%',
+              width: '60%', height: '60%',
+              background: `radial-gradient(circle, ${NINJA_THEME.error}1F 0%, transparent 70%)`,
+              borderRadius: '50%',
+              filter: 'blur(50px)',
+              pointerEvents: 'none',
+              animation: 'floatBlob1 20s ease-in-out infinite alternate',
+              zIndex: 1,
+            }} />
+            <div style={{
+              position: 'absolute',
+              bottom: '-15%', right: '-15%',
+              width: '60%', height: '60%',
+              background: `radial-gradient(circle, ${NINJA_THEME.accentPrimary}1F 0%, transparent 70%)`,
+              borderRadius: '50%',
+              filter: 'blur(50px)',
+              pointerEvents: 'none',
+              animation: 'floatBlob2 25s ease-in-out infinite alternate',
+              zIndex: 1,
+            }} />
             <div style={{
               background: 'rgba(11, 23, 50, 0.9)',
               border: `1.5px solid ${NINJA_THEME.error}`,
