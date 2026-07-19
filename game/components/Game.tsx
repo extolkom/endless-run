@@ -1595,17 +1595,21 @@ function drawPlayer(
 
               {/* CELO earned */}
               <div style={{
-                background: '#0a0f00', border: `2px solid ${PAL.coin}`,
-                padding: '10px', marginBottom: 16,
+                background: 'rgba(11, 23, 50, 0.6)',
+                border: `1.5px solid ${PAL.coin}`,
+                borderRadius: BORDER_RADIUS.card,
+                boxShadow: '0 0 16px rgba(251, 191, 36, 0.15)',
+                padding: '12px 14px',
+                marginBottom: 16,
               }}>
-                <div style={{ color: PAL.coin, fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginBottom: 5 }}>🪙 CELO EARNED</div>
+                <div style={{ color: PAL.coin, fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginBottom: 6, letterSpacing: 0.5 }}>🪙 CELO EARNED</div>
                 <div style={{
-                  color: '#fff', fontSize: 16,
+                  color: NINJA_THEME.text, fontSize: 16,
                   fontFamily: '"Press Start 2P", monospace',
-                  textShadow: `0 0 10px ${PAL.coin}`,
+                  textShadow: `0 0 12px ${PAL.coin}`,
                   animation: 'pop 0.4s ease',
                 }}>{uiCelo.toFixed(4)}</div>
-                <div style={{ color: '#444', fontSize: 5, fontFamily: '"Press Start 2P", monospace', marginTop: 5 }}>
+                <div style={{ color: 'rgba(230, 245, 255, 0.4)', fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginTop: 6 }}>
                   LIFETIME: {uiTotalCelo.toFixed(4)} CELO
                 </div>
               </div>
