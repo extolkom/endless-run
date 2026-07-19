@@ -1579,10 +1579,15 @@ function drawPlayer(
             }}>
               <div style={{ fontSize: 32, marginBottom: 6 }}>💥</div>
               <div style={{
-                color: PAL.red, fontSize: 18,
-                fontFamily: '"Press Start 2P", monospace',
-                textShadow: `2px 2px 0 #000, 0 0 20px ${PAL.red}`,
+                background: GRADIENTS.errorGradient,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontSize: 22,
+                fontFamily: FONT_FAMILY.display,
+                filter: 'drop-shadow(0 0 16px rgba(255, 90, 109, 0.5))',
                 marginBottom: 4,
+                lineHeight: 1.4,
+                letterSpacing: 1,
               }}>GAME OVER</div>
               <div style={{ color: '#555', fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginBottom: 20, letterSpacing: 2 }}>
                 THE CHEETAH HAS FALLEN
