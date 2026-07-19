@@ -1553,17 +1553,22 @@ function drawPlayer(
           <div style={{
             position: 'absolute', inset: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'rgba(0,0,0,0.88)',
+            background: `linear-gradient(135deg, ${NINJA_THEME.bg}, ${NINJA_THEME.bgSecondary})`,
             animation: 'fadeIn 0.35s ease',
+            overflow: 'hidden',
           }}>
             <div style={{
-              background: '#100010',
-              border: '4px solid #ef4444',
-              boxShadow: '0 0 40px #ef444440, 6px 6px 0 #000',
+              background: 'rgba(11, 23, 50, 0.9)',
+              border: `1.5px solid ${NINJA_THEME.error}`,
+              borderRadius: BORDER_RADIUS.container,
+              boxShadow: SHADOWS.glowStrongError,
+              backdropFilter: 'blur(8px)',
               padding: '24px 20px',
               textAlign: 'center',
               maxWidth: 320,
               width: '92%',
+              position: 'relative',
+              zIndex: 5,
               animation: 'shake 0.5s ease',
             }}>
               <div style={{ fontSize: 32, marginBottom: 6 }}>💥</div>
