@@ -109,9 +109,9 @@ function px(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: n
   ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
 }
 
-function pixelText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, size: number, color: string, shadow = true) {
+function pixelText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, size: number, color: string, shadow = true, font = FONT_FAMILY.display) {
   ctx.imageSmoothingEnabled = false;
-  ctx.font = `${size}px "Press Start 2P", monospace`;
+  ctx.font = `${size}px ${font}`;
   if (shadow) { ctx.fillStyle = '#000'; ctx.fillText(text, x + 2, y + 2); }
   ctx.fillStyle = color;
   ctx.fillText(text, x, y);
@@ -443,7 +443,7 @@ function drawPlayer(
     ctx.imageSmoothingEnabled = false;
 
     // Score
-    pixelText(ctx, `${String(score).padStart(6, '0')}`, 12, 26, 9, PAL.neon);
+    pixelText(ctx, `${String(score).padStart(6, '0')}`, 12, 26, 10, NINJA_THEME.accentPrimary);
 
     // Level badge
     const lvlColors = ['#7c3aed', '#a855f7', '#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#f43f5e', '#22d3ee'];
