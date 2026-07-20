@@ -1898,7 +1898,7 @@ function drawPlayer(
         {showLeaderboard && (
           <div style={{
             position: 'absolute', inset: 0,
-            background: 'rgba(0,0,0,0.93)',
+            background: `linear-gradient(135deg, ${NINJA_THEME.bg}, ${NINJA_THEME.bgSecondary})`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             padding: 16,
             zIndex: 30,
