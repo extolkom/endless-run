@@ -1711,14 +1711,15 @@ function drawPlayer(
                 </div>
               )}
 
-              {/* ── BUY LIVES — Subway Surfers style ── */}
+              {/* ── BUY LIVES — Restyled container ── */}
               <div style={{
-                background: '#0a0018',
-                border: `3px solid ${walletData.isConnected ? PAL.purple : '#333'}`,
-                boxShadow: walletData.isConnected ? `0 0 20px ${PAL.purple}40` : 'none',
-                padding: '14px',
+                background: 'rgba(11, 23, 50, 0.9)',
+                border: `1.5px solid ${NINJA_THEME.accentPrimary}`,
+                borderRadius: BORDER_RADIUS.container,
+                boxShadow: SHADOWS.glowMediumBlue,
+                backdropFilter: 'blur(8px)',
+                padding: '16px 14px',
                 marginBottom: 16,
-                animation: walletData.isConnected ? 'pulse 1.5s infinite' : 'none',
               }}>
                 <div style={{ fontSize: 22, marginBottom: 6 }}>❤️</div>
                 <div style={{
