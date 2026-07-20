@@ -448,11 +448,11 @@ function drawPlayer(
     // Level badge
     const lvlColors = ['#7c3aed', '#a855f7', '#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#f43f5e', '#22d3ee'];
     const lc = lvlColors[Math.min(level - 1, 7)];
-    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillStyle = 'rgba(11, 23, 50, 0.7)';
     ctx.fillRect(W / 2 - 28, 6, 56, 22);
     ctx.fillStyle = lc;
-    ctx.font = `7px "Press Start 2P", monospace`;
-    ctx.fillText(`LVL ${level}`, W / 2 - 20, 22);
+    ctx.font = `7px ${FONT_FAMILY.display}`;
+    ctx.fillText(`LVL ${level}`, W / 2 - 20, 21);
 
     // Wallet info (top right)
     if (walletAddress) {
