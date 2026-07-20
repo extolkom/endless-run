@@ -1959,28 +1959,31 @@ function drawPlayer(
                         key={`${entry.player}-${entry.timestamp}-${index}`}
                         style={{
                           display: 'flex', alignItems: 'center', gap: 10,
-                          padding: '10px 10px',
-                          background: isCurrentPlayer ? '#081820' : '#11111c',
-                          border: `2px solid ${index < 3 ? rankColors[index] : '#2a2a3a'}`,
-                          boxShadow: index < 3 ? `0 0 10px ${rankColors[index]}33` : 'none',
+                          padding: '10px 12px',
+                          background: isCurrentPlayer ? 'rgba(57, 195, 255, 0.15)' : 'rgba(11, 23, 50, 0.6)',
+                          border: `1.5px solid ${index < 3 ? rankColors[index] : 'rgba(57, 195, 255, 0.25)'}`,
+                          borderRadius: BORDER_RADIUS.card,
+                          boxShadow: index < 3 ? `0 0 12px ${rankColors[index]}33` : SHADOWS.glowSoftBlue,
                         }}
                       >
                         <div style={{
-                          width: 34, height: 34,
+                          width: 32, height: 32,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          background: index < 3 ? '#1a1400' : '#111',
-                          color: index < 3 ? rankColors[index] : '#aaa',
+                          background: index < 3 ? 'rgba(26, 20, 0, 0.6)' : 'rgba(11, 23, 50, 0.8)',
+                          color: index < 3 ? rankColors[index] : NINJA_THEME.text,
                           fontSize: index < 3 ? 12 : 10,
-                          border: `2px solid ${index < 3 ? rankColors[index] : '#444'}`,
+                          borderRadius: BORDER_RADIUS.button,
+                          border: `1px solid ${index < 3 ? rankColors[index] : 'rgba(57, 195, 255, 0.3)'}`,
+                          fontFamily: '"Press Start 2P", monospace',
                         }}>{rankIcon}</div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center', marginBottom: 4 }}>
-                            <div style={{ color: isCurrentPlayer ? PAL.neon : '#fff', fontSize: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <div style={{ color: isCurrentPlayer ? PAL.neon : NINJA_THEME.text, fontSize: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: '"Press Start 2P", monospace' }}>
                               {formatAddress(entry.player)}{isCurrentPlayer ? ' · YOU' : ''}
                             </div>
-                            <div style={{ color: PAL.amber, fontSize: 6 }}>{entry.score}</div>
+                            <div style={{ color: NINJA_THEME.accentPrimary, fontSize: 7, fontFamily: '"Press Start 2P", monospace', textShadow: `0 0 8px ${NINJA_THEME.accentPrimary}66` }}>{entry.score}</div>
                           </div>
-                          <div style={{ color: '#777', fontSize: 5 }}>
+                          <div style={{ color: 'rgba(230, 245, 255, 0.4)', fontSize: 5, fontFamily: '"Press Start 2P", monospace' }}>
                             {new Date(entry.timestamp * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                           </div>
                         </div>
