@@ -1906,15 +1906,27 @@ function drawPlayer(
           }}>
             <div style={{
               width: '100%', maxWidth: 360,
-              background: '#0b0b14',
-              border: '3px solid #FFD700',
-              boxShadow: '0 0 25px #FFD70055, 6px 6px 0 #000',
-              padding: 16,
-              color: '#fff',
+              background: 'rgba(11, 23, 50, 0.9)',
+              border: `1.5px solid ${NINJA_THEME.accentPrimary}`,
+              borderRadius: BORDER_RADIUS.container,
+              boxShadow: SHADOWS.glowMediumBlue,
+              backdropFilter: 'blur(8px)',
+              padding: 20,
+              color: NINJA_THEME.text,
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <div style={{ color: '#FFD700', fontSize: 10, lineHeight: 1.4 }}>
-                  🏆 LEADERBOARD<br />TOP 5 CHEETAHS
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <div style={{
+                  background: `linear-gradient(135deg, ${NINJA_THEME.accentPrimary}, ${NINJA_THEME.accentSecondary})`,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  fontSize: 15,
+                  fontFamily: FONT_FAMILY.display,
+                  textShadow: '0 0 20px rgba(57, 195, 255, 0.4)',
+                  animation: 'glow 2s infinite',
+                  lineHeight: 1.3,
+                }}>
+                  🏆 LEADERBOARD<br />
+                  <span style={{ fontSize: 9, letterSpacing: 1 }}>TOP 5 CHEETAHS</span>
                 </div>
                 <button
                   onClick={() => setShowLeaderboard(false)}
