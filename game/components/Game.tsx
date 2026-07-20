@@ -462,10 +462,10 @@ function drawPlayer(
     }
 
     // CELO top right (adjusted position)
-    pixelText(ctx, `${celoEarned.toFixed(4)}`, W - 100, 36, 7, PAL.coin);
-    ctx.fillStyle = PAL.coinShd;
-    ctx.font = `5px "Press Start 2P", monospace`;
-    ctx.fillText('CELO', W - 100, 48);
+    pixelText(ctx, `${celoEarned.toFixed(4)}`, W - 100, 36, 8, NINJA_THEME.accentPrimary);
+    ctx.fillStyle = PAL.coin;
+    ctx.font = `6px ${FONT_FAMILY.display}`;
+    ctx.fillText('CELO 🪙', W - 100, 48);
 
     // Lives — hearts
     for (let i = 0; i < Math.min(lives, 5); i++) {
