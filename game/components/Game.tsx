@@ -1369,6 +1369,68 @@ function drawPlayer(
             flex: none;
             max-width: 320px;
           }
+          .stat-cards-column {
+            max-width: 320px;
+          }
+        }
+        .stat-cards-column {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+          width: 100%;
+          max-width: 380px;
+        }
+        .stat-cards-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+          width: 100%;
+        }
+        .stat-card {
+          background: rgba(11, 23, 50, 0.85);
+          border: 1px solid rgba(57, 195, 255, 0.25);
+          border-radius: ${BORDER_RADIUS.container};
+          padding: 12px 14px;
+          backdrop-filter: blur(10px);
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+          transition: all 0.2s ease;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+        .stat-card-full {
+          grid-column: span 2;
+        }
+        .stat-card-header {
+          color: ${NINJA_THEME.accentPrimary};
+          font-size: 8px;
+          font-family: ${FONT_FAMILY.display};
+          letter-spacing: 1px;
+          margin-bottom: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+        .stat-card-value {
+          color: ${NINJA_THEME.text};
+          font-size: 13px;
+          font-family: ${FONT_FAMILY.fallback};
+          font-weight: bold;
+        }
+        .stat-card-subtext {
+          color: ${PAL.coin};
+          font-size: 6px;
+          font-family: ${FONT_FAMILY.fallback};
+          margin-top: 4px;
+        }
+        @media (max-width: 380px) {
+          .stat-cards-grid {
+            grid-template-columns: 1fr;
+          }
+          .stat-card-full {
+            grid-column: span 1;
+          }
         }
         .start-card-title {
           background: linear-gradient(135deg, ${NINJA_THEME.accentPrimary}, ${NINJA_THEME.accentSecondary});
@@ -1639,93 +1701,83 @@ function drawPlayer(
                 </div>
               </div>
 
-              {/* Interim Right Column (Will be replaced by Section 3 & 4) */}
-              <div className="start-card-container" style={{ flex: 1, maxWidth: 320, margin: 0 }}>
-              {/* Logo / Icon Accent */}
-              <svg
-                viewBox="0 0 100 100"
-                width="32"
-                height="32"
-                fillRule="evenodd"
-                style={{
-                  fill: NINJA_THEME.accentPrimary,
-                  filter: `drop-shadow(0 0 8px ${NINJA_THEME.accentPrimary}88)`,
-                  display: 'block',
-                  margin: `0 auto ${SPACING.sm}`,
-                  animation: 'spin 12s linear infinite',
-                }}
-              >
-                <path d="M 50 10 C 50 35 65 35 90 50 C 65 50 65 65 50 90 C 50 65 35 65 10 50 C 35 50 35 35 50 10 Z M 50 42 A 8 8 0 1 0 50 58 A 8 8 0 1 0 50 42 Z" />
-              </svg>
-
-              {/* Title */}
-              <div className="start-card-title">ENDLESS RUN</div>
-              <div style={{
-                color: PAL.coin, fontSize: 7,
-                fontFamily: '"Press Start 2P", monospace',
-                letterSpacing: 3, marginBottom: 20,
-              }}>× CELO EDITION ×</div>
-
-              <div style={{ fontSize: 44, marginBottom: 18 }}>🐆</div>
-
-              {/* Controls */}
-              <div style={{
-                background: 'rgba(11, 23, 50, 0.5)',
-                border: '1px solid rgba(57, 195, 255, 0.25)',
-                borderRadius: BORDER_RADIUS.button,
-                padding: `${SPACING.sm} ${SPACING.md}`,
-                marginBottom: SPACING.md,
-                textAlign: 'left',
-              }}>
-                {[
-                  ['TAP / SPACE', 'JUMP'],
-                  ['TAP AGAIN', 'DOUBLE JUMP'],
-                ].map(([k, v]) => (
-                  <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: SPACING.xs }}>
-                    <span style={{ color: 'rgba(230, 245, 255, 0.8)', fontSize: 7, fontFamily: '"Press Start 2P", monospace' }}>{k}</span>
-                    <span style={{ color: 'rgba(230, 245, 255, 0.4)', fontSize: 7, fontFamily: '"Press Start 2P", monospace' }}>{v}</span>
+              {/* SECTION 3: Stat Cards Grid & Right Dashboard Column */}
+              <div className="stat-cards-column">
+                <div className="stat-cards-grid">
+                  {/* Card 1: High Score */}
+                  <div className="stat-card">
+                    <div className="stat-card-header">
+                      <span>BEST SCORE</span>
+                      <span>🏆</span>
+                    </div>
+                    <div className="stat-card-value" style={{ color: PAL.neon }}>
+                      {uiHighScore > 0 ? uiHighScore.toLocaleString() : '0'}
+                    </div>
+                    <div className="stat-card-subtext">PERSONAL BEST</div>
                   </div>
-                ))}
-              </div>
 
-              {/* Earn info */}
-              <div style={{
-                background: '#0a0f00', border: `2px solid ${PAL.coin}`,
-                padding: '10px', marginBottom: 20,
-              }}>
-                <div style={{ color: PAL.coin, fontSize: 7, fontFamily: '"Press Start 2P", monospace', lineHeight: 2.2 }}>
-                  🪙 COIN EVERY 30 SEC<br />
-                  <span style={{ color: PAL.neon }}>= +{CELO_PER_COIN} CELO EACH</span><br />
-                  <span style={{ color: '#888' }}>FIRST COIN @ 5 SEC</span>
+                  {/* Card 2: Earning Protocol */}
+                  <div className="stat-card">
+                    <div className="stat-card-header">
+                      <span>EARN PROTOCOL</span>
+                      <span>🪙</span>
+                    </div>
+                    <div className="stat-card-value" style={{ color: PAL.coin }}>
+                      +{CELO_PER_COIN} {walletData.isMinipay ? 'USDm' : 'CELO'}
+                    </div>
+                    <div className="stat-card-subtext">PER RUNNING COIN</div>
+                  </div>
+
+                  {/* Card 3: Controls Guide (Full Width) */}
+                  <div className="stat-card stat-card-full">
+                    <div className="stat-card-header">
+                      <span>CONTROLS GUIDE</span>
+                      <span style={{ color: NINJA_THEME.accentSecondary }}>⚡</span>
+                    </div>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: 8,
+                      background: 'rgba(57, 195, 255, 0.05)',
+                      padding: '8px 10px',
+                      borderRadius: BORDER_RADIUS.button,
+                      border: '1px solid rgba(57, 195, 255, 0.15)',
+                    }}>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ color: 'rgba(230, 245, 255, 0.5)', fontSize: 5, fontFamily: FONT_FAMILY.fallback }}>ACTION</span>
+                        <span style={{ color: NINJA_THEME.text, fontSize: 6, fontFamily: FONT_FAMILY.fallback, marginTop: 2 }}>TAP / SPACE</span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                        <span style={{ color: 'rgba(230, 245, 255, 0.5)', fontSize: 5, fontFamily: FONT_FAMILY.fallback }}>EFFECT</span>
+                        <span style={{ color: NINJA_THEME.accentPrimary, fontSize: 6, fontFamily: FONT_FAMILY.fallback, marginTop: 2 }}>JUMP / D-JUMP</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {uiTotalCelo > 0 && (
+                  <div style={{ color: PAL.coin, fontSize: 6, fontFamily: FONT_FAMILY.fallback, textTransform: 'uppercase', textAlign: 'center' }}>
+                    LIFETIME EARNED: {uiTotalCelo.toFixed(4)} {walletData.isMinipay ? 'USDm' : 'CELO'}
+                  </div>
+                )}
+
+                {/* Interim Action CTAs (To be polished in Section 4) */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 2 }}>
+                  <button
+                    onClick={() => startGame()}
+                    className="start-card-btn-start"
+                  >
+                    ▶ START RUN
+                  </button>
+
+                  <button
+                    onClick={openLeaderboard}
+                    className="start-card-btn-leaderboard"
+                  >
+                    🏆 LEADERBOARD
+                  </button>
                 </div>
               </div>
-
-              {uiTotalCelo > 0 && (
-                <div style={{ color: PAL.coin, fontSize: 7, fontFamily: '"Press Start 2P", monospace', marginBottom: 14 }}>
-                  LIFETIME: {uiTotalCelo.toFixed(4)} CELO
-                </div>
-              )}
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 4 }}>
-                <button
-                  onClick={() => startGame()}
-                  className="start-card-btn-start"
-                >
-                  ▶ START
-                </button>
-
-                <button
-                  onClick={openLeaderboard}
-                  className="start-card-btn-leaderboard"
-                >
-                  🏆 LEADERBOARD
-                </button>
-              </div>
-
-              <div style={{ color: 'rgba(230, 245, 255, 0.35)', fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginTop: SPACING.md }}>
-                PRESS ENTER TO START
-              </div>
-            </div>
           </div>
         </div>
         )}
