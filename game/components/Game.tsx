@@ -1281,23 +1281,6 @@ function drawPlayer(
 
     // ─── Styles ────────────────────────────────────────────────────────────────
 
-    const pixelBtn = (bg: string, fg = '#000', sm = false) => ({
-      background: bg,
-      color: fg,
-      border: '3px solid #000',
-      boxShadow: '4px 4px 0 #000',
-      fontFamily: '"Press Start 2P", monospace',
-      fontSize: sm ? 9 : 11,
-      padding: sm ? '10px 18px' : '13px 24px',
-      cursor: 'pointer',
-      letterSpacing: 0.5,
-      imageRendering: 'pixelated' as const,
-      transition: 'transform 0.08s, box-shadow 0.08s',
-      display: 'inline-block',
-      lineHeight: 1.4,
-      textAlign: 'center' as const,
-    });
-
     return (
       <div style={{
         width: '100vw', height: '100vh',
@@ -1713,23 +1696,24 @@ function drawPlayer(
 
               {/* ── BUY LIVES — Subway Surfers style ── */}
               <div style={{
-                background: '#0a0018',
-                border: `3px solid ${walletData.isConnected ? PAL.purple : '#333'}`,
-                boxShadow: walletData.isConnected ? `0 0 20px ${PAL.purple}40` : 'none',
+                background: 'rgba(11, 23, 50, 0.6)',
+                border: `1.5px solid ${walletData.isConnected ? NINJA_THEME.accentSecondary : 'rgba(57, 195, 255, 0.2)'}`,
+                borderRadius: BORDER_RADIUS.card,
+                boxShadow: walletData.isConnected ? '0 0 16px rgba(168, 85, 247, 0.25)' : 'none',
                 padding: '14px',
                 marginBottom: 16,
-                animation: walletData.isConnected ? 'pulse 1.5s infinite' : 'none',
               }}>
-                <div style={{ fontSize: 22, marginBottom: 6 }}>❤️</div>
+                <div style={{ fontSize: 24, marginBottom: 6, filter: 'drop-shadow(0 0 8px rgba(255, 90, 109, 0.5))' }}>❤️</div>
                 <div style={{
-                  color: walletData.isConnected ? PAL.purple : '#666',
+                  color: walletData.isConnected ? NINJA_THEME.accentSecondary : 'rgba(230, 245, 255, 0.5)',
                   fontSize: 8,
                   fontFamily: '"Press Start 2P", monospace',
-                  marginBottom: 4,
+                  marginBottom: 6,
+                  letterSpacing: 0.5,
                 }}>CONTINUE?</div>
-                <div style={{ color: '#888', fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginBottom: 10, lineHeight: 2 }}>
+                <div style={{ color: 'rgba(230, 245, 255, 0.7)', fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginBottom: 12, lineHeight: 2 }}>
                   GET {EXTRA_LIVES} LIVES<br />
-                  <span style={{ color: PAL.coin }}>
+                  <span style={{ color: PAL.coin, textShadow: `0 0 8px ${PAL.coin}` }}>
                     COSTS {walletData.isMinipay ? `${LIVES_COST_USDM} USDm` : `${LIVES_COST_CELO} CELO`}
                   </span>
                 </div>
@@ -1743,15 +1727,53 @@ function drawPlayer(
                     onClick={buyLives}
                     disabled={isProcessingBuy}
                     style={{
-                      ...pixelBtn(PAL.purple, '#fff', true),
+                      background: GRADIENTS.accentBlue,
+                      color: NINJA_THEME.bg,
+                      border: '1.5px solid rgba(255, 255, 255, 0.25)',
+                      borderRadius: BORDER_RADIUS.button,
+                      boxShadow: SHADOWS.glowMediumBlue,
+                      fontFamily: '"Press Start 2P", monospace',
+                      fontSize: 10,
+                      padding: '12px 18px',
+                      minHeight: 44,
                       width: '100%',
-                      animation: 'none',
                       opacity: isProcessingBuy ? 0.6 : 1,
                       cursor: isProcessingBuy ? 'not-allowed' : 'pointer',
+                      letterSpacing: 0.5,
+                      transition: 'all 0.2s ease',
+                      fontWeight: 'bold',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                     }}
-                    onMouseEnter={e => { if (!isProcessingBuy) { e.currentTarget.style.transform = 'translate(-2px,-2px)'; } }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = ''; }}
-                  >
+                    onMouseEnter={e => {
+                      if (!isProcessingBuy) {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = SHADOWS.glowStrongBlue;
+                        e.currentTarget.style.background = GRADIENTS.accentBlueReverse;
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      if (!isProcessingBuy) {
+                        e.currentTarget.style.transform = 'none';
+                        e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                        e.currentTarget.style.background = GRADIENTS.accentBlue;
+                      }
+                    }}
+                    onTouchStart={e => {
+                      if (!isProcessingBuy) {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = SHADOWS.glowStrongBlue;
+                        e.currentTarget.style.background = GRADIENTS.accentBlueReverse;
+                      }
+                    }}
+                    onTouchEnd={e => {
+                      if (!isProcessingBuy) {
+                        e.currentTarget.style.transform = 'none';
+                        e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                        e.currentTarget.style.background = GRADIENTS.accentBlue;
+                      }
+                    }}>
                     {isProcessingBuy ? '⏳ PROCESSING...' : '💎 BUY LIVES'}
                   </button>
                 )}
