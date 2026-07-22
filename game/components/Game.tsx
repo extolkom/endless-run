@@ -1959,16 +1959,21 @@ function drawPlayer(
                   style={{
                     background: 'transparent',
                     color: NINJA_THEME.accentPrimary,
-                    border: `1px solid ${NINJA_THEME.accentPrimary}`,
+                    border: `1.5px solid ${NINJA_THEME.accentPrimary}`,
                     borderRadius: BORDER_RADIUS.button,
                     fontFamily: '"Press Start 2P", monospace',
-                    padding: '6px 10px',
-                    fontSize: 8,
+                    padding: '8px 12px',
+                    fontSize: 10,
+                    minHeight: 44,
+                    minWidth: 44,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.transform = 'scale(1.1)';
+                    e.currentTarget.style.transform = 'scale(1.05)';
                     e.currentTarget.style.background = 'rgba(57, 195, 255, 0.15)';
                   }}
                   onMouseLeave={e => {
@@ -1979,11 +1984,11 @@ function drawPlayer(
               </div>
 
               {lbLoading ? (
-                <div style={{ padding: '24px 0', textAlign: 'center', color: PAL.cyan, fontSize: 8 }}>
+                <div style={{ padding: '24px 0', textAlign: 'center', color: NINJA_THEME.accentPrimary, fontSize: 8 }}>
                   ⏳ LOADING...
                 </div>
               ) : topScores.length === 0 ? (
-                <div style={{ padding: '24px 0', textAlign: 'center', color: '#888', fontSize: 7, lineHeight: 2 }}>
+                <div style={{ padding: '24px 0', textAlign: 'center', color: 'rgba(230, 245, 255, 0.5)', fontSize: 7, lineHeight: 2 }}>
                   NO RUNS YET
                 </div>
               ) : (
@@ -2042,10 +2047,13 @@ function drawPlayer(
                   fontFamily: '"Press Start 2P", monospace',
                   fontSize: 10,
                   padding: '12px 24px',
+                  minHeight: 44,
                   cursor: 'pointer',
                   letterSpacing: 0.5,
                   transition: 'all 0.2s ease',
-                  display: 'inline-block',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   fontWeight: 'bold',
                   textAlign: 'center',
                   width: '100%',
