@@ -470,12 +470,15 @@ function drawPlayer(
     // Lives — hearts
     for (let i = 0; i < Math.min(lives, 5); i++) {
       ctx.font = '14px sans-serif';
-      ctx.fillText('❤️', 12 + i * 18, 46);
+      ctx.shadowColor = 'rgba(255, 90, 109, 0.6)';
+      ctx.shadowBlur = 8;
+      ctx.fillText('❤️', 14 + i * 18, 46);
     }
+    ctx.shadowBlur = 0;
     if (lives > 5) {
-      ctx.fillStyle = PAL.red;
+      ctx.fillStyle = NINJA_THEME.error;
       ctx.font = `6px "Press Start 2P", monospace`;
-      ctx.fillText(`+${lives - 5}`, 12 + 5 * 18, 46);
+      ctx.fillText(`+${lives - 5}`, 14 + 5 * 18, 46);
     }
 
     // Speed bar
