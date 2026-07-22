@@ -1281,23 +1281,6 @@ function drawPlayer(
 
     // ─── Styles ────────────────────────────────────────────────────────────────
 
-    const pixelBtn = (bg: string, fg = '#000', sm = false) => ({
-      background: bg,
-      color: fg,
-      border: '3px solid #000',
-      boxShadow: '4px 4px 0 #000',
-      fontFamily: '"Press Start 2P", monospace',
-      fontSize: sm ? 9 : 11,
-      padding: sm ? '10px 18px' : '13px 24px',
-      cursor: 'pointer',
-      letterSpacing: 0.5,
-      imageRendering: 'pixelated' as const,
-      transition: 'transform 0.08s, box-shadow 0.08s',
-      display: 'inline-block',
-      lineHeight: 1.4,
-      textAlign: 'center' as const,
-    });
-
     return (
       <div style={{
         width: '100vw', height: '100vh',
