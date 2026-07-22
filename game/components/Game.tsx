@@ -1713,12 +1713,12 @@ function drawPlayer(
 
               {/* ── BUY LIVES — Subway Surfers style ── */}
               <div style={{
-                background: '#0a0018',
-                border: `3px solid ${walletData.isConnected ? PAL.purple : '#333'}`,
-                boxShadow: walletData.isConnected ? `0 0 20px ${PAL.purple}40` : 'none',
+                background: 'rgba(11, 23, 50, 0.6)',
+                border: `1.5px solid ${walletData.isConnected ? NINJA_THEME.accentSecondary : 'rgba(57, 195, 255, 0.2)'}`,
+                borderRadius: BORDER_RADIUS.card,
+                boxShadow: walletData.isConnected ? '0 0 16px rgba(168, 85, 247, 0.25)' : 'none',
                 padding: '14px',
                 marginBottom: 16,
-                animation: walletData.isConnected ? 'pulse 1.5s infinite' : 'none',
               }}>
                 <div style={{ fontSize: 22, marginBottom: 6 }}>❤️</div>
                 <div style={{
