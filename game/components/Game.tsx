@@ -1426,10 +1426,12 @@ function drawPlayer(
         {gamePhase === 'idle' && (
           <div style={{
             position: 'absolute', inset: 0,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
             background: `linear-gradient(135deg, ${NINJA_THEME.bg}, ${NINJA_THEME.bgSecondary})`,
             animation: 'fadeIn 0.3s ease',
             overflow: 'hidden',
+            padding: '16px',
           }}>
             {/* Ambient Background Blobs */}
             <div style={{
@@ -1454,6 +1456,92 @@ function drawPlayer(
               animation: 'floatBlob2 25s ease-in-out infinite alternate',
               zIndex: 1,
             }} />
+
+            {/* SECTION 1: Top Bar Header (Title + Wallet Status Pill) */}
+            <header style={{
+              position: 'absolute',
+              top: 0, left: 0, right: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '16px 24px',
+              zIndex: 10,
+              width: '100%',
+              boxSizing: 'border-box',
+            }}>
+              {/* Left Brand Title */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <svg
+                  viewBox="0 0 100 100"
+                  width="22"
+                  height="22"
+                  fillRule="evenodd"
+                  style={{
+                    fill: NINJA_THEME.accentPrimary,
+                    filter: `drop-shadow(0 0 6px ${NINJA_THEME.accentPrimary}aa)`,
+                    animation: 'spin 12s linear infinite',
+                  }}
+                >
+                  <path d="M 50 10 C 50 35 65 35 90 50 C 65 50 65 65 50 90 C 50 65 35 65 10 50 C 35 50 35 35 50 10 Z M 50 42 A 8 8 0 1 0 50 58 A 8 8 0 1 0 50 42 Z" />
+                </svg>
+                <div>
+                  <div style={{
+                    color: NINJA_THEME.text,
+                    fontSize: 10,
+                    fontFamily: FONT_FAMILY.display,
+                    letterSpacing: 1,
+                    textShadow: `0 0 10px ${NINJA_THEME.accentPrimary}66`,
+                  }}>
+                    ENDLESS RUN
+                  </div>
+                  <div style={{
+                    color: PAL.coin,
+                    fontSize: 5,
+                    fontFamily: FONT_FAMILY.fallback,
+                    letterSpacing: 1.5,
+                  }}>
+                    CELO EDITION
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Wallet Status Pill */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                background: 'rgba(11, 23, 50, 0.8)',
+                border: `1.5px solid ${walletData.isConnected ? NINJA_THEME.accentPrimary : 'rgba(57, 195, 255, 0.3)'}`,
+                borderRadius: BORDER_RADIUS.button,
+                boxShadow: walletData.isConnected ? SHADOWS.glowSoftBlue : 'none',
+                backdropFilter: 'blur(8px)',
+                padding: '6px 12px',
+              }}>
+                <div style={{
+                  width: 8, height: 8,
+                  borderRadius: '50%',
+                  background: walletData.isConnected ? NINJA_THEME.success : 'rgba(230, 245, 255, 0.4)',
+                  boxShadow: walletData.isConnected ? `0 0 8px ${NINJA_THEME.success}` : 'none',
+                }} />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                  <div style={{
+                    color: walletData.isConnected ? NINJA_THEME.text : 'rgba(230, 245, 255, 0.6)',
+                    fontSize: 6,
+                    fontFamily: FONT_FAMILY.fallback,
+                  }}>
+                    {walletData.isConnected ? formatAddress(walletData.address) : (walletData.isMinipay ? 'MINIPAY CONNECTED' : 'WALLET DISCONNECTED')}
+                  </div>
+                  {walletData.isConnected && (
+                    <div style={{
+                      color: PAL.coin,
+                      fontSize: 6,
+                      fontFamily: FONT_FAMILY.fallback,
+                      fontWeight: 'bold',
+                    }}>
+                      {walletData.balance} {walletData.isMinipay ? 'USDm' : 'CELO'}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </header>
 
             <div className="start-card-container">
               {/* Logo / Icon Accent */}
