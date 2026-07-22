@@ -1931,6 +1931,10 @@ function drawPlayer(
                   MENU
                 </button>
               </div>
+
+              <div style={{ color: 'rgba(230, 245, 255, 0.35)', fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginTop: SPACING.md }}>
+                PRESS ENTER TO RESTART
+              </div>
             </div>
           </div>
         )}
