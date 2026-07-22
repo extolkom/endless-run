@@ -461,11 +461,14 @@ function drawPlayer(
       pixelText(ctx, `${walletBalance} ${isMinipay ? 'USDm' : 'C'}`, W - 140, 24, 6, PAL.coin);
     }
 
-    // CELO top right (adjusted position)
-    pixelText(ctx, `${celoEarned.toFixed(4)}`, W - 100, 36, 7, PAL.coin);
-    ctx.fillStyle = PAL.coinShd;
+    // CELO top right
+    ctx.shadowColor = 'rgba(251, 191, 36, 0.5)';
+    ctx.shadowBlur = 8;
+    pixelText(ctx, `${celoEarned.toFixed(4)}`, W - 105, 36, 7, PAL.coin);
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(230, 245, 255, 0.6)';
     ctx.font = `5px "Press Start 2P", monospace`;
-    ctx.fillText('CELO', W - 100, 48);
+    ctx.fillText('CELO', W - 105, 48);
 
     // Lives — hearts
     for (let i = 0; i < Math.min(lives, 5); i++) {
