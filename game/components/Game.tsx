@@ -1720,16 +1720,17 @@ function drawPlayer(
                 padding: '14px',
                 marginBottom: 16,
               }}>
-                <div style={{ fontSize: 22, marginBottom: 6 }}>❤️</div>
+                <div style={{ fontSize: 24, marginBottom: 6, filter: 'drop-shadow(0 0 8px rgba(255, 90, 109, 0.5))' }}>❤️</div>
                 <div style={{
-                  color: walletData.isConnected ? PAL.purple : '#666',
+                  color: walletData.isConnected ? NINJA_THEME.accentSecondary : 'rgba(230, 245, 255, 0.5)',
                   fontSize: 8,
                   fontFamily: '"Press Start 2P", monospace',
-                  marginBottom: 4,
+                  marginBottom: 6,
+                  letterSpacing: 0.5,
                 }}>CONTINUE?</div>
-                <div style={{ color: '#888', fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginBottom: 10, lineHeight: 2 }}>
+                <div style={{ color: 'rgba(230, 245, 255, 0.7)', fontSize: 6, fontFamily: '"Press Start 2P", monospace', marginBottom: 12, lineHeight: 2 }}>
                   GET {EXTRA_LIVES} LIVES<br />
-                  <span style={{ color: PAL.coin }}>
+                  <span style={{ color: PAL.coin, textShadow: `0 0 8px ${PAL.coin}` }}>
                     COSTS {walletData.isMinipay ? `${LIVES_COST_USDM} USDm` : `${LIVES_COST_CELO} CELO`}
                   </span>
                 </div>
