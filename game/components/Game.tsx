@@ -443,7 +443,7 @@ function drawPlayer(
     ctx.imageSmoothingEnabled = false;
 
     // Score
-    pixelText(ctx, `${String(score).padStart(6, '0')}`, 12, 26, 9, PAL.neon);
+    pixelText(ctx, `${String(score).padStart(6, '0')}`, 14, 26, 9, NINJA_THEME.accentPrimary);
 
     // Level badge
     const lvlColors = ['#7c3aed', '#a855f7', '#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#f43f5e', '#22d3ee'];
