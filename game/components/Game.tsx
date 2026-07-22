@@ -1898,19 +1898,47 @@ function drawPlayer(
         {showLeaderboard && (
           <div style={{
             position: 'absolute', inset: 0,
-            background: 'rgba(0,0,0,0.93)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: `linear-gradient(135deg, ${NINJA_THEME.bg}, ${NINJA_THEME.bgSecondary})`,
             padding: 16,
             zIndex: 30,
             animation: 'fadeIn 0.2s ease',
+            overflow: 'hidden',
           }}>
+            {/* Ambient Background Blobs */}
+            <div style={{
+              position: 'absolute',
+              top: '-15%', left: '-15%',
+              width: '60%', height: '60%',
+              background: `radial-gradient(circle, ${NINJA_THEME.accentPrimary}1A 0%, transparent 70%)`,
+              borderRadius: '50%',
+              filter: 'blur(50px)',
+              pointerEvents: 'none',
+              animation: 'floatBlob1 20s ease-in-out infinite alternate',
+              zIndex: 1,
+            }} />
+            <div style={{
+              position: 'absolute',
+              bottom: '-15%', right: '-15%',
+              width: '60%', height: '60%',
+              background: `radial-gradient(circle, ${NINJA_THEME.accentSecondary}1A 0%, transparent 70%)`,
+              borderRadius: '50%',
+              filter: 'blur(50px)',
+              pointerEvents: 'none',
+              animation: 'floatBlob2 25s ease-in-out infinite alternate',
+              zIndex: 1,
+            }} />
             <div style={{
               width: '100%', maxWidth: 360,
-              background: '#0b0b14',
-              border: '3px solid #FFD700',
-              boxShadow: '0 0 25px #FFD70055, 6px 6px 0 #000',
-              padding: 16,
-              color: '#fff',
+              background: 'rgba(11, 23, 50, 0.9)',
+              border: `1.5px solid ${NINJA_THEME.accentPrimary}`,
+              borderRadius: BORDER_RADIUS.container,
+              boxShadow: SHADOWS.glowMediumBlue,
+              backdropFilter: 'blur(8px)',
+              padding: 20,
+              color: NINJA_THEME.text,
+              position: 'relative',
+              zIndex: 5,
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                 <div style={{ color: '#FFD700', fontSize: 10, lineHeight: 1.4 }}>
