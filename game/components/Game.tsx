@@ -1898,39 +1898,82 @@ function drawPlayer(
         {showLeaderboard && (
           <div style={{
             position: 'absolute', inset: 0,
-            background: 'rgba(0,0,0,0.93)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: `linear-gradient(135deg, ${NINJA_THEME.bg}, ${NINJA_THEME.bgSecondary})`,
             padding: 16,
             zIndex: 30,
             animation: 'fadeIn 0.2s ease',
+            overflow: 'hidden',
           }}>
+            {/* Ambient Background Blobs */}
+            <div style={{
+              position: 'absolute',
+              top: '-15%', left: '-15%',
+              width: '60%', height: '60%',
+              background: `radial-gradient(circle, ${NINJA_THEME.accentPrimary}1A 0%, transparent 70%)`,
+              borderRadius: '50%',
+              filter: 'blur(50px)',
+              pointerEvents: 'none',
+              animation: 'floatBlob1 20s ease-in-out infinite alternate',
+              zIndex: 1,
+            }} />
+            <div style={{
+              position: 'absolute',
+              bottom: '-15%', right: '-15%',
+              width: '60%', height: '60%',
+              background: `radial-gradient(circle, ${NINJA_THEME.accentSecondary}1A 0%, transparent 70%)`,
+              borderRadius: '50%',
+              filter: 'blur(50px)',
+              pointerEvents: 'none',
+              animation: 'floatBlob2 25s ease-in-out infinite alternate',
+              zIndex: 1,
+            }} />
             <div style={{
               width: '100%', maxWidth: 360,
-              background: '#0b0b14',
-              border: '3px solid #FFD700',
-              boxShadow: '0 0 25px #FFD70055, 6px 6px 0 #000',
-              padding: 16,
-              color: '#fff',
+              background: 'rgba(11, 23, 50, 0.9)',
+              border: `1.5px solid ${NINJA_THEME.accentPrimary}`,
+              borderRadius: BORDER_RADIUS.container,
+              boxShadow: SHADOWS.glowMediumBlue,
+              backdropFilter: 'blur(8px)',
+              padding: 20,
+              color: NINJA_THEME.text,
+              position: 'relative',
+              zIndex: 5,
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <div style={{ color: '#FFD700', fontSize: 10, lineHeight: 1.4 }}>
-                  🏆 LEADERBOARD<br />TOP 5 CHEETAHS
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <div style={{
+                  background: GRADIENTS.accentBlue,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  fontFamily: FONT_FAMILY.display,
+                  fontSize: 14,
+                  lineHeight: 1.3,
+                  letterSpacing: 0.5,
+                  filter: 'drop-shadow(0 0 12px rgba(57, 195, 255, 0.4))',
+                }}>
+                  🏆 LEADERBOARD<br />
+                  <span style={{ fontSize: 8, fontFamily: '"Press Start 2P", monospace', WebkitTextFillColor: 'rgba(230, 245, 255, 0.7)', letterSpacing: 1 }}>TOP 5 RUNNERS</span>
                 </div>
                 <button
                   onClick={() => setShowLeaderboard(false)}
                   style={{
                     background: 'transparent',
                     color: NINJA_THEME.accentPrimary,
-                    border: `1px solid ${NINJA_THEME.accentPrimary}`,
+                    border: `1.5px solid ${NINJA_THEME.accentPrimary}`,
                     borderRadius: BORDER_RADIUS.button,
                     fontFamily: '"Press Start 2P", monospace',
-                    padding: '6px 10px',
-                    fontSize: 8,
+                    padding: '8px 12px',
+                    fontSize: 10,
+                    minHeight: 44,
+                    minWidth: 44,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
                   }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.transform = 'scale(1.1)';
+                    e.currentTarget.style.transform = 'scale(1.05)';
                     e.currentTarget.style.background = 'rgba(57, 195, 255, 0.15)';
                   }}
                   onMouseLeave={e => {
@@ -1941,11 +1984,11 @@ function drawPlayer(
               </div>
 
               {lbLoading ? (
-                <div style={{ padding: '24px 0', textAlign: 'center', color: PAL.cyan, fontSize: 8 }}>
+                <div style={{ padding: '24px 0', textAlign: 'center', color: NINJA_THEME.accentPrimary, fontSize: 8 }}>
                   ⏳ LOADING...
                 </div>
               ) : topScores.length === 0 ? (
-                <div style={{ padding: '24px 0', textAlign: 'center', color: '#888', fontSize: 7, lineHeight: 2 }}>
+                <div style={{ padding: '24px 0', textAlign: 'center', color: 'rgba(230, 245, 255, 0.5)', fontSize: 7, lineHeight: 2 }}>
                   NO RUNS YET
                 </div>
               ) : (
@@ -1959,28 +2002,31 @@ function drawPlayer(
                         key={`${entry.player}-${entry.timestamp}-${index}`}
                         style={{
                           display: 'flex', alignItems: 'center', gap: 10,
-                          padding: '10px 10px',
-                          background: isCurrentPlayer ? '#081820' : '#11111c',
-                          border: `2px solid ${index < 3 ? rankColors[index] : '#2a2a3a'}`,
-                          boxShadow: index < 3 ? `0 0 10px ${rankColors[index]}33` : 'none',
+                          padding: '10px 12px',
+                          background: isCurrentPlayer ? 'rgba(57, 195, 255, 0.12)' : 'rgba(11, 23, 50, 0.6)',
+                          border: `1.5px solid ${index < 3 ? rankColors[index] : 'rgba(57, 195, 255, 0.2)'}`,
+                          borderRadius: BORDER_RADIUS.card,
+                          boxShadow: index < 3 ? `0 0 12px ${rankColors[index]}33` : 'none',
                         }}
                       >
                         <div style={{
-                          width: 34, height: 34,
+                          width: 32, height: 32,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          background: index < 3 ? '#1a1400' : '#111',
-                          color: index < 3 ? rankColors[index] : '#aaa',
+                          background: index < 3 ? 'rgba(255, 215, 0, 0.15)' : 'rgba(11, 23, 50, 0.8)',
+                          color: index < 3 ? rankColors[index] : 'rgba(230, 245, 255, 0.7)',
                           fontSize: index < 3 ? 12 : 10,
-                          border: `2px solid ${index < 3 ? rankColors[index] : '#444'}`,
+                          borderRadius: BORDER_RADIUS.button,
+                          border: `1px solid ${index < 3 ? rankColors[index] : 'rgba(255, 255, 255, 0.15)'}`,
+                          fontWeight: 'bold',
                         }}>{rankIcon}</div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center', marginBottom: 4 }}>
-                            <div style={{ color: isCurrentPlayer ? PAL.neon : '#fff', fontSize: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <div style={{ color: isCurrentPlayer ? NINJA_THEME.accentPrimary : NINJA_THEME.text, fontSize: 6, fontFamily: '"Press Start 2P", monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {formatAddress(entry.player)}{isCurrentPlayer ? ' · YOU' : ''}
                             </div>
-                            <div style={{ color: PAL.amber, fontSize: 6 }}>{entry.score}</div>
+                            <div style={{ color: NINJA_THEME.accentPrimary, fontSize: 6, fontFamily: '"Press Start 2P", monospace', fontWeight: 'bold' }}>{entry.score}</div>
                           </div>
-                          <div style={{ color: '#777', fontSize: 5 }}>
+                          <div style={{ color: 'rgba(230, 245, 255, 0.4)', fontSize: 5, fontFamily: '"Press Start 2P", monospace' }}>
                             {new Date(entry.timestamp * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                           </div>
                         </div>
@@ -2001,10 +2047,13 @@ function drawPlayer(
                   fontFamily: '"Press Start 2P", monospace',
                   fontSize: 10,
                   padding: '12px 24px',
+                  minHeight: 44,
                   cursor: 'pointer',
                   letterSpacing: 0.5,
                   transition: 'all 0.2s ease',
-                  display: 'inline-block',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   fontWeight: 'bold',
                   textAlign: 'center',
                   width: '100%',
