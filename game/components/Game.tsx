@@ -1743,15 +1743,53 @@ function drawPlayer(
                     onClick={buyLives}
                     disabled={isProcessingBuy}
                     style={{
-                      ...pixelBtn(PAL.purple, '#fff', true),
+                      background: GRADIENTS.accentBlue,
+                      color: NINJA_THEME.bg,
+                      border: '1.5px solid rgba(255, 255, 255, 0.25)',
+                      borderRadius: BORDER_RADIUS.button,
+                      boxShadow: SHADOWS.glowMediumBlue,
+                      fontFamily: '"Press Start 2P", monospace',
+                      fontSize: 10,
+                      padding: '12px 18px',
+                      minHeight: 44,
                       width: '100%',
-                      animation: 'none',
                       opacity: isProcessingBuy ? 0.6 : 1,
                       cursor: isProcessingBuy ? 'not-allowed' : 'pointer',
+                      letterSpacing: 0.5,
+                      transition: 'all 0.2s ease',
+                      fontWeight: 'bold',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
                     }}
-                    onMouseEnter={e => { if (!isProcessingBuy) { e.currentTarget.style.transform = 'translate(-2px,-2px)'; } }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = ''; }}
-                  >
+                    onMouseEnter={e => {
+                      if (!isProcessingBuy) {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = SHADOWS.glowStrongBlue;
+                        e.currentTarget.style.background = GRADIENTS.accentBlueReverse;
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      if (!isProcessingBuy) {
+                        e.currentTarget.style.transform = 'none';
+                        e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                        e.currentTarget.style.background = GRADIENTS.accentBlue;
+                      }
+                    }}
+                    onTouchStart={e => {
+                      if (!isProcessingBuy) {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = SHADOWS.glowStrongBlue;
+                        e.currentTarget.style.background = GRADIENTS.accentBlueReverse;
+                      }
+                    }}
+                    onTouchEnd={e => {
+                      if (!isProcessingBuy) {
+                        e.currentTarget.style.transform = 'none';
+                        e.currentTarget.style.boxShadow = SHADOWS.glowMediumBlue;
+                        e.currentTarget.style.background = GRADIENTS.accentBlue;
+                      }
+                    }}>
                     {isProcessingBuy ? '⏳ PROCESSING...' : '💎 BUY LIVES'}
                   </button>
                 )}
