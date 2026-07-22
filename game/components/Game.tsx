@@ -1673,9 +1673,9 @@ function drawPlayer(
                 <div style={{
                   background: 'rgba(11, 23, 50, 0.6)',
                   border: `1.5px solid ${onChainStatus === 'saved' ? NINJA_THEME.success : NINJA_THEME.error}`,
-                  borderRadius: BORDER_RADIUS.button,
+                  borderRadius: BORDER_RADIUS.card,
                   boxShadow: onChainStatus === 'saved' ? SHADOWS.glowMediumSuccess : SHADOWS.glowStrongError,
-                  padding: '8px 12px',
+                  padding: '10px 14px',
                   marginBottom: 16,
                 }}>
                   <div style={{
