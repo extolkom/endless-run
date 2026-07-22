@@ -1330,6 +1330,46 @@ function drawPlayer(
           z-index: 5;
           transition: all 0.2s ease;
         }
+        .dashboard-stage-container {
+          display: flex;
+          flex-direction: row;
+          gap: 20px;
+          align-items: center;
+          justify-content: center;
+          width: 92%;
+          max-width: 680px;
+          position: relative;
+          z-index: 5;
+          margin-top: 50px;
+        }
+        .hero-stage-panel {
+          background: rgba(11, 23, 50, 0.85);
+          border: 1.5px solid ${NINJA_THEME.accentPrimary};
+          border-radius: ${BORDER_RADIUS.container};
+          box-shadow: ${SHADOWS.glowMediumBlue};
+          backdrop-filter: blur(12px);
+          padding: 24px 20px;
+          text-align: center;
+          flex: 0 0 220px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          box-sizing: border-box;
+          width: 100%;
+        }
+        @media (max-width: 640px) {
+          .dashboard-stage-container {
+            flex-direction: column;
+            margin-top: 75px;
+            gap: 16px;
+            width: 92%;
+          }
+          .hero-stage-panel {
+            flex: none;
+            max-width: 320px;
+          }
+        }
         .start-card-title {
           background: linear-gradient(135deg, ${NINJA_THEME.accentPrimary}, ${NINJA_THEME.accentSecondary});
           -webkit-background-clip: text;
@@ -1543,7 +1583,64 @@ function drawPlayer(
               </div>
             </header>
 
-            <div className="start-card-container">
+            {/* MAIN DASHBOARD STAGE CONTAINER */}
+            <div className="dashboard-stage-container">
+              {/* SECTION 2: Hero Character Stage Panel (Left Panel) */}
+              <div className="hero-stage-panel">
+                {/* Avatar Frame Badge (Placeholder Shuriken Icon) */}
+                <div style={{
+                  width: 88,
+                  height: 88,
+                  borderRadius: '50%',
+                  background: 'rgba(57, 195, 255, 0.08)',
+                  border: `1.5px solid ${NINJA_THEME.accentPrimary}`,
+                  boxShadow: SHADOWS.glowStrongBlue,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 14,
+                  position: 'relative',
+                }}>
+                  <svg
+                    viewBox="0 0 100 100"
+                    width="52"
+                    height="52"
+                    fillRule="evenodd"
+                    style={{
+                      fill: NINJA_THEME.accentPrimary,
+                      filter: `drop-shadow(0 0 10px ${NINJA_THEME.accentPrimary}cc)`,
+                      animation: 'spin 16s linear infinite',
+                    }}
+                  >
+                    <path d="M 50 10 C 50 35 65 35 90 50 C 65 50 65 65 50 90 C 50 65 35 65 10 50 C 35 50 35 35 50 10 Z M 50 42 A 8 8 0 1 0 50 58 A 8 8 0 1 0 50 42 Z" />
+                  </svg>
+                </div>
+
+                {/* Hero Title & Subtitle */}
+                <div style={{
+                  color: NINJA_THEME.text,
+                  fontSize: 11,
+                  fontFamily: FONT_FAMILY.display,
+                  letterSpacing: 1,
+                  textShadow: `0 0 12px ${NINJA_THEME.accentPrimary}88`,
+                  marginBottom: 4,
+                  lineHeight: 1.4,
+                }}>
+                  NINJA RUNNER
+                </div>
+                <div style={{
+                  color: PAL.coin,
+                  fontSize: 5,
+                  fontFamily: FONT_FAMILY.fallback,
+                  letterSpacing: 1.5,
+                  fontWeight: 'bold',
+                }}>
+                  STAGE 01 · CELO DRIFTER
+                </div>
+              </div>
+
+              {/* Interim Right Column (Will be replaced by Section 3 & 4) */}
+              <div className="start-card-container" style={{ flex: 1, maxWidth: 320, margin: 0 }}>
               {/* Logo / Icon Accent */}
               <svg
                 viewBox="0 0 100 100"
@@ -1630,6 +1727,7 @@ function drawPlayer(
               </div>
             </div>
           </div>
+        </div>
         )}
 
         {/* ── GAME OVER SCREEN — Subway Surfers style with buy lives ── */}
