@@ -1940,9 +1940,19 @@ function drawPlayer(
               position: 'relative',
               zIndex: 5,
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <div style={{ color: '#FFD700', fontSize: 10, lineHeight: 1.4 }}>
-                  🏆 LEADERBOARD<br />TOP 5 CHEETAHS
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <div style={{
+                  background: GRADIENTS.accentBlue,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  fontFamily: FONT_FAMILY.display,
+                  fontSize: 14,
+                  lineHeight: 1.3,
+                  letterSpacing: 0.5,
+                  filter: 'drop-shadow(0 0 12px rgba(57, 195, 255, 0.4))',
+                }}>
+                  🏆 LEADERBOARD<br />
+                  <span style={{ fontSize: 8, fontFamily: '"Press Start 2P", monospace', WebkitTextFillColor: 'rgba(230, 245, 255, 0.7)', letterSpacing: 1 }}>TOP 5 RUNNERS</span>
                 </div>
                 <button
                   onClick={() => setShowLeaderboard(false)}
