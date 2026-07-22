@@ -455,20 +455,21 @@ function drawPlayer(
     ctx.fillText(`LVL ${level}`, W / 2 - 20, 22);
 
     // Wallet info (top right)
+    const rightMargin = Math.min(135, W * 0.36);
     if (walletAddress) {
       const walletStr = formatAddress(walletAddress);
-      pixelText(ctx, walletStr, W - 140, 12, 6, '#8888ff');
-      pixelText(ctx, `${walletBalance} ${isMinipay ? 'USDm' : 'C'}`, W - 140, 24, 6, PAL.coin);
+      pixelText(ctx, walletStr, W - rightMargin, 12, 6, '#8888ff');
+      pixelText(ctx, `${walletBalance} ${isMinipay ? 'USDm' : 'C'}`, W - rightMargin, 24, 6, PAL.coin);
     }
 
     // CELO top right
     ctx.shadowColor = 'rgba(251, 191, 36, 0.5)';
     ctx.shadowBlur = 8;
-    pixelText(ctx, `${celoEarned.toFixed(4)}`, W - 105, 36, 7, PAL.coin);
+    pixelText(ctx, `${celoEarned.toFixed(4)}`, W - Math.min(100, rightMargin * 0.75), 36, 7, PAL.coin);
     ctx.shadowBlur = 0;
     ctx.fillStyle = 'rgba(230, 245, 255, 0.6)';
     ctx.font = `5px "Press Start 2P", monospace`;
-    ctx.fillText('CELO', W - 105, 48);
+    ctx.fillText('CELO', W - Math.min(100, rightMargin * 0.75), 48);
 
     // Lives — hearts
     for (let i = 0; i < Math.min(lives, 5); i++) {
