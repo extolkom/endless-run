@@ -1577,6 +1577,17 @@ function drawPlayer(
               zIndex: 1,
             }} />
             <div style={{
+              position: 'absolute',
+              top: '40%', left: '30%',
+              width: '40%', height: '40%',
+              background: `radial-gradient(circle, ${NINJA_THEME.accentSecondary}12 0%, transparent 70%)`,
+              borderRadius: '50%',
+              filter: 'blur(60px)',
+              pointerEvents: 'none',
+              animation: 'floatBlob1 18s ease-in-out infinite alternate-reverse',
+              zIndex: 1,
+            }} />
+            <div style={{
               background: 'rgba(11, 23, 50, 0.9)',
               border: `1.5px solid ${NINJA_THEME.error}`,
               borderRadius: BORDER_RADIUS.container,
