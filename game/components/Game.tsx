@@ -443,7 +443,7 @@ function drawPlayer(
     ctx.imageSmoothingEnabled = false;
 
     // Score
-    pixelText(ctx, `${String(score).padStart(6, '0')}`, 12, 26, 9, PAL.neon);
+    pixelText(ctx, `${String(score).padStart(6, '0')}`, 14, 26, 9, NINJA_THEME.accentPrimary);
 
     // Level badge
     const lvlColors = ['#7c3aed', '#a855f7', '#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#f43f5e', '#22d3ee'];
@@ -455,27 +455,34 @@ function drawPlayer(
     ctx.fillText(`LVL ${level}`, W / 2 - 20, 22);
 
     // Wallet info (top right)
+    const rightMargin = Math.min(135, W * 0.36);
     if (walletAddress) {
       const walletStr = formatAddress(walletAddress);
-      pixelText(ctx, walletStr, W - 140, 12, 6, '#8888ff');
-      pixelText(ctx, `${walletBalance} ${isMinipay ? 'USDm' : 'C'}`, W - 140, 24, 6, PAL.coin);
+      pixelText(ctx, walletStr, W - rightMargin, 12, 6, '#8888ff');
+      pixelText(ctx, `${walletBalance} ${isMinipay ? 'USDm' : 'C'}`, W - rightMargin, 24, 6, PAL.coin);
     }
 
-    // CELO top right (adjusted position)
-    pixelText(ctx, `${celoEarned.toFixed(4)}`, W - 100, 36, 7, PAL.coin);
-    ctx.fillStyle = PAL.coinShd;
+    // CELO top right
+    ctx.shadowColor = 'rgba(251, 191, 36, 0.5)';
+    ctx.shadowBlur = 8;
+    pixelText(ctx, `${celoEarned.toFixed(4)}`, W - Math.min(100, rightMargin * 0.75), 36, 7, PAL.coin);
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(230, 245, 255, 0.6)';
     ctx.font = `5px "Press Start 2P", monospace`;
-    ctx.fillText('CELO', W - 100, 48);
+    ctx.fillText('CELO', W - Math.min(100, rightMargin * 0.75), 48);
 
     // Lives — hearts
     for (let i = 0; i < Math.min(lives, 5); i++) {
       ctx.font = '14px sans-serif';
-      ctx.fillText('❤️', 12 + i * 18, 46);
+      ctx.shadowColor = 'rgba(255, 90, 109, 0.6)';
+      ctx.shadowBlur = 8;
+      ctx.fillText('❤️', 14 + i * 18, 46);
     }
+    ctx.shadowBlur = 0;
     if (lives > 5) {
-      ctx.fillStyle = PAL.red;
+      ctx.fillStyle = NINJA_THEME.error;
       ctx.font = `6px "Press Start 2P", monospace`;
-      ctx.fillText(`+${lives - 5}`, 12 + 5 * 18, 46);
+      ctx.fillText(`+${lives - 5}`, 14 + 5 * 18, 46);
     }
 
     // Speed bar
