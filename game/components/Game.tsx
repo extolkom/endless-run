@@ -1542,7 +1542,7 @@ function drawPlayer(
             {/* Dark Gradient Overlay */}
             <div style={{
               position: 'absolute', inset: 0,
-              background: 'linear-gradient(rgba(5, 10, 25, 0.75), rgba(5, 10, 25, 0.85))',
+              background: 'linear-gradient(rgba(5, 10, 25, 0.55), rgba(5, 10, 25, 0.65))',
               pointerEvents: 'none',
               zIndex: 0,
             }} />
