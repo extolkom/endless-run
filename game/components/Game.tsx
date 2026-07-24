@@ -1530,11 +1530,23 @@ function drawPlayer(
             position: 'absolute', inset: 0,
             display: 'flex', flexDirection: 'column',
             alignItems: 'center', justifyContent: 'center',
-            background: `linear-gradient(135deg, ${NINJA_THEME.bg}, ${NINJA_THEME.bgSecondary})`,
+            backgroundImage: "url('/images/bg-skyline.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'fixed',
             animation: 'fadeIn 0.3s ease',
             overflow: 'hidden',
             padding: '16px',
           }}>
+            {/* Dark Gradient Overlay */}
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(rgba(5, 10, 25, 0.75), rgba(5, 10, 25, 0.85))',
+              pointerEvents: 'none',
+              zIndex: 0,
+            }} />
+
             {/* Ambient Background Blobs */}
             <div style={{
               position: 'absolute',
@@ -1755,28 +1767,25 @@ function drawPlayer(
                   </div>
                 </div>
 
+                <button
+                  onClick={() => startGame()}
+                  className="start-card-btn-start"
+                >
+                  ▶ START RUN
+                </button>
+
+                <button
+                  onClick={openLeaderboard}
+                  className="start-card-btn-leaderboard"
+                >
+                  🏆 LEADERBOARD
+                </button>
+
                 {uiTotalCelo > 0 && (
                   <div style={{ color: PAL.coin, fontSize: 6, fontFamily: FONT_FAMILY.fallback, textTransform: 'uppercase', textAlign: 'center' }}>
                     LIFETIME EARNED: {uiTotalCelo.toFixed(4)} {walletData.isMinipay ? 'USDm' : 'CELO'}
                   </div>
                 )}
-
-                {/* Interim Action CTAs (To be polished in Section 4) */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 2 }}>
-                  <button
-                    onClick={() => startGame()}
-                    className="start-card-btn-start"
-                  >
-                    ▶ START RUN
-                  </button>
-
-                  <button
-                    onClick={openLeaderboard}
-                    className="start-card-btn-leaderboard"
-                  >
-                    🏆 LEADERBOARD
-                  </button>
-                </div>
               </div>
           </div>
         </div>
